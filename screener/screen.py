@@ -289,12 +289,13 @@ def main():
     spx = json.loads(fetch(SPX_HIST_URL))["data"]
     closes = [float(x["close"]) for x in spx if float(x["close"]) > 0]
 
-    cands, counts, prices, mkt, asof = [], {}, {}, None, None
+    cands, counts, prices, mkt, asof, quote_time = [], {}, {}, None, None, ""
     for und, ucfg in cfg["underlyings"].items():
         meta, und_asof, expiries = load_chain(und, ucfg["root"])
         if mkt is None:
             mkt = market_context(meta, spx) if und == "SPX" else None
         asof = max(asof, und_asof) if asof else und_asof
+        quote_time = max(quote_time, meta["last_trade_time"])
         prices[und] = meta["current_price"]
         merged = dict(cfg, **ucfg)
         rejects = {}
@@ -310,6 +311,8 @@ def main():
 
     report = {
         "asof": asof.isoformat(),
+        # Cboe 最後報價時間（美東時間，延遲約 15 分鐘）
+        "quote_time": quote_time,
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "source": "Cboe delayed quotes",
         "disclaimer": "依自訂規則的模型篩選結果，僅供教育研究，不是投資建議。",
@@ -318,6 +321,16 @@ def main():
         "counts": counts,
         "candidates": top_per_strategy(cands, cfg["top_n_per_strategy"]),
     }
+
+    # 報價時間沒變（休市、盤後重跑）就不改檔案，避免產生沒有內容的 commit
+    latest = OUT / "latest.json"
+    if latest.exists():
+        try:
+            if json.loads(latest.read_text()).get("quote_time") == quote_time:
+                print(f"報價時間 {quote_time} 未變動，略過寫檔")
+                return 0
+        except ValueError:
+            pass
 
     hist = OUT / "history"
     hist.mkdir(parents=True, exist_ok=True)

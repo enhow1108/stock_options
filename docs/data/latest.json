@@ -1,6 +1,7 @@
 {
  "asof": "2026-10-30",
- "generated_at": "2026-10-30T23:42:57+00:00",
+ "quote_time": "2026-10-30T16:14:59",
+ "generated_at": "2026-10-30T23:48:13+00:00",
  "source": "Cboe delayed quotes",
  "disclaimer": "依自訂規則的模型篩選結果，僅供教育研究，不是投資建議。",
  "config": {

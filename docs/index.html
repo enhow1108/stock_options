@@ -612,7 +612,10 @@ document.getElementById('tab-calc').onclick = () => showTab('calc');
 
   function render() {
     const m = data.market;
-    $('meta').textContent = `篩選資料  ${data.asof} · 產生於 ${data.generated_at.replace('T', ' ').slice(0, 16)} UTC · ${data.source}`;
+    const qt = data.quote_time ? data.quote_time.replace('T', ' ').slice(0, 16) + ' 美東' : data.asof;
+    const live = !$('day').value;
+    $('meta').textContent = `報價 ${qt}（Cboe 延遲約 15 分鐘）` +
+      (live ? ` · 盤中每 15 分鐘更新 · 頁面上次檢查 ${new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}` : ' · 歷史資料');
     const kpi = (k, v, n, c = '') => `<div class="kpi"><div class="k">${k}</div><div class="v ${c}">${v}</div>${n ? `<div class="n">${n}</div>` : ''}</div>`;
     $('market').innerHTML = [
       kpi('SPX', m.spx.toFixed(2), m.spx_change_pct != null ? `${m.spx_change_pct > 0 ? '+' : ''}${m.spx_change_pct.toFixed(2)}%` : '', cls(m.spx_change_pct)),
@@ -684,6 +687,24 @@ document.getElementById('tab-calc').onclick = () => showTab('calc');
       $('meta').textContent = '讀取資料失敗：' + err.message;
     }
   }
+
+  // 看「最新」時每 5 分鐘檢查一次；頁面切回前景時也立刻檢查
+  let lastCheck = 0;
+  async function refresh() {
+    if ($('day').value || Date.now() - lastCheck < 60 * 1000) return;
+    lastCheck = Date.now();
+    try {
+      const r = await fetch('data/latest.json', { cache: 'no-store' });
+      const next = await r.json();
+      if (!data || next.quote_time !== data.quote_time || next.generated_at !== data.generated_at) {
+        data = next;
+        window.Calc.setMarket(data.market.spx);
+      }
+      render();
+    } catch (err) { /* 網路暫時失敗就等下一輪 */ }
+  }
+  setInterval(refresh, 5 * 60 * 1000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
 
   $('day').addEventListener('change', () => load($('day').value ? `data/history/${$('day').value}.json` : 'data/latest.json'));
 

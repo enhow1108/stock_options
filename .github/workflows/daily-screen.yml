@@ -2,8 +2,11 @@ name: daily-screen
 
 on:
   schedule:
-    # 週一到週五 21:30 UTC（美東收盤後約 1–1.5 小時，夏令／冬令皆已收盤）
-    - cron: "30 21 * * 1-5"
+    # 盤中每 15 分鐘（13:00–21:45 UTC 涵蓋美東 9:30–16:15，夏令／冬令皆適用）
+    # GitHub 的排程常延遲 5–20 分鐘，尖峰時段可能略過個別執行
+    - cron: "*/15 13-21 * * 1-5"
+    # 收盤後再跑一次，確保拿到收盤報價
+    - cron: "30 22 * * 1-5"
   workflow_dispatch:
 
 permissions:
@@ -35,6 +38,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes"
           else
-            git commit -m "data: screen $(jq -r .asof docs/data/latest.json)"
+            git commit -m "data: screen $(jq -r '.quote_time // .asof' docs/data/latest.json)"
+            git pull --rebase
             git push
           fi
