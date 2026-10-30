@@ -2,8 +2,8 @@
 
 研究與教育用途，**不是投資建議**。
 
-- `docs/calculator/`：SPX 價差損益／期望值計算器（純前端，直接開 `index.html` 即可）
-- `docs/index.html`：每日篩選報告頁（讀取 `docs/data/latest.json`）
+- `docs/index.html`：網頁 app，底部選單切換「篩選」（每日報告，讀 `docs/data/latest.json`）與「計算器」
+- `docs/engine.js`：損益／期望值計算核心
 - `screener/screen.py`：每日篩選器，只用 Python 標準庫；規則在 `screener/config.json`
 - `.github/workflows/daily-screen.yml`：每個交易日收盤後自動執行並 commit 結果
 - `reports/`、`research_notes/`：策略研究報告與筆記
@@ -12,6 +12,7 @@
 
 ```bash
 python3 screener/screen.py
+python3 -m http.server 8000 --directory docs   # 打開 http://localhost:8000
 ```
 
 ## 方法
@@ -26,4 +27,4 @@ python3 screener/screen.py
 ## GitHub Pages
 
 Settings → Pages → Source 選 *Deploy from a branch*，Branch 選 `main`、資料夾 `/docs`。
-注意：Pages 網站是公開的（private repo 需要 GitHub Pro 才能開 Pages，而且網站本身仍然公開）。
+網址會是 https://enhow1108.github.io/stock_options/ 。注意：免費帳號的 Pages 需要 public repo，網站本身也是公開的。
