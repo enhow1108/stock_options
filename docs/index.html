@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPX 價差每日篩選</title>
+<style>
+:root {
+  --bg: #f7f7f5; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6b66; --line: #e3e2dd;
+  --accent: #2f5bd3; --good: #1f8a4c; --bad: #c2412d; --warn: #b7791f; --fill: rgba(47,91,211,.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141413; --panel: #1e1e1c; --ink: #ecebe6; --muted: #9b9a93; --line: #34332f;
+    --accent: #7c9cf5; --good: #4cc27f; --bad: #f07a63; --warn: #e0a84a; --fill: rgba(124,156,245,.12);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141413; --panel: #1e1e1c; --ink: #ecebe6; --muted: #9b9a93; --line: #34332f;
+  --accent: #7c9cf5; --good: #4cc27f; --bad: #f07a63; --warn: #e0a84a; --fill: rgba(124,156,245,.12);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Segoe UI", sans-serif; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 20px 16px 48px; }
+h1 { font-size: 20px; margin: 0; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 10px; }
+a { color: var(--accent); }
+.top { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; justify-content: space-between; margin-bottom: 16px; }
+.sub { color: var(--muted); font-size: 13px; }
+select { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.kpi { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.kpi .k { font-size: 12px; color: var(--muted); }
+.kpi .v { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.kpi .n { font-size: 11px; color: var(--muted); }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { padding: 6px 6px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font-weight: 500; color: var(--muted); font-size: 12px; cursor: pointer; user-select: none; }
+th:hover { color: var(--ink); }
+td.l, th.l { text-align: left; }
+tbody tr:hover { background: var(--fill); }
+.pos { color: var(--good); } .neg { color: var(--bad); }
+.tag { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--line); }
+.legs { font-size: 12px; }
+.note { font-size: 12px; color: var(--muted); }
+.warn { border-left: 3px solid var(--warn); padding: 10px 14px; background: var(--fill); border-radius: 4px; font-size: 13px; margin-bottom: 16px; }
+.rules { display: flex; flex-wrap: wrap; gap: 6px; }
+.rules span { font-size: 12px; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; }
+ul { margin: 6px 0 0; padding-left: 20px; }
+li { margin: 3px 0; }
+.empty { color: var(--muted); padding: 24px 0; text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>SPX 信用價差每日篩選</h1>
+      <div class="sub" id="meta">載入中…</div>
+    </div>
+    <div class="sub">
+      日期 <select id="day"></select>
+      · <a href="calculator/">開啟計算器</a>
+    </div>
+  </div>
+
+  <div class="warn">依你自訂規則（<code>screener/config.json</code>）用模型與歷史資料篩出的組合，<b>不是投資建議，也不是買賣訊號</b>。資料為 Cboe 收盤延遲報價，實際成交價會不同。</div>
+
+  <section class="card">
+    <h2>市場背景</h2>
+    <div class="kpis" id="market"></div>
+  </section>
+
+  <section class="card">
+    <h2>篩選規則</h2>
+    <div class="rules" id="rules"></div>
+  </section>
+
+  <section class="card">
+    <h2>候選組合（每種策略取前幾名，依「模型與歷史兩者中較差的 EV ÷ 最大虧損」排序；點欄位可重排）</h2>
+    <div class="scroll"><table id="tbl"></table></div>
+    <p class="note" id="rejects"></p>
+  </section>
+
+  <section class="card">
+    <h2>怎麼看這張表</h2>
+    <ul class="note">
+      <li><b>收（成交估計）</b>：介於 mid 與 natural（賣 bid、買 ask）之間，依 <code>fill_haircut</code> 設定。</li>
+      <li><b>模型</b>：Student-t 肥尾分佈，實現波動 = ATM IV × <code>real_vol_ratio</code>。<b>歷史</b>：1975 年起 SPX 所有相同天數的實際報酬（含 1987、2008、2020），沒有模型假設，但包含過去 50 年的牛市漂移。</li>
+      <li><b>需要勝率</b>：最大虧損 ÷（最大獲利＋最大虧損）。實際勝率只比它高幾個百分點，是這類策略的常態。</li>
+      <li>所有數字都假設<b>持有到期</b>。tastylive 常見的「賺 50% 或剩 21 天出場」會改變損益分佈，請用計算器的評估日功能模擬。</li>
+      <li>部位大小請用<b>最大虧損</b>計算，不是用收到的權利金。SPX 一口 50 點寬價差的最大虧損約 $4,500；小帳戶可考慮 XSP（SPX 的 1/10）。</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const NAMES = { bull_put: 'Bull Put', bear_call: 'Bear Call', iron_condor: 'Iron Condor' };
+  const usd = (v) => (v < 0 ? '−$' : '$') + Math.abs(v).toLocaleString('en-US', { maximumFractionDigits: 0 });
+  const pct = (v, d = 1) => v == null ? '—' : (v * 100).toFixed(d) + '%';
+  const cls = (v) => v > 0 ? 'pos' : v < 0 ? 'neg' : '';
+  let data = null, sortKey = 'score', sortDir = -1;
+
+  const COLS = [
+    { k: 'strategy', t: '策略', l: true, f: (c) => `<span class="tag">${NAMES[c.strategy] || c.strategy}</span>`, v: (c) => c.strategy },
+    { k: 'expiry', t: '到期 / DTE', l: true, f: (c) => `${c.expiry.slice(5)} · ${c.dte}d`, v: (c) => c.dte },
+    { k: 'legs', t: '各腳（short Δ）', l: true, f: (c) => `<span class="legs">${legsText(c)}</span>`, v: (c) => c.legs[0].strike },
+    { k: 'credit', t: '收（mid / nat）', f: (c) => `<b>${c.credit_fill.toFixed(2)}</b> <span class="note">${c.credit_mid.toFixed(2)} / ${c.credit_natural.toFixed(2)}</span>`, v: (c) => c.credit_fill },
+    { k: 'maxp', t: '最大獲利', f: (c) => usd(c.max_profit), v: (c) => c.max_profit },
+    { k: 'maxl', t: '最大虧損', f: (c) => `<span class="neg">${usd(-c.max_loss)}</span>`, v: (c) => -c.max_loss },
+    { k: 'bewr', t: '需要勝率', f: (c) => pct(c.breakeven_win_rate_fixed), v: (c) => c.breakeven_win_rate_fixed },
+    { k: 'pop', t: '勝率 模型 / 歷史', f: (c) => `${pct(c.base.pop)} / ${pct(c.historical.pop)}`, v: (c) => c.historical.pop },
+    { k: 'pml', t: '最大虧損機率（歷史）', f: (c) => pct(c.historical.p_max_loss), v: (c) => -c.historical.p_max_loss },
+    { k: 'ev', t: 'EV 模型 / 歷史', f: (c) => `<span class="${cls(c.base.ev)}">${usd(c.base.ev)}</span> / <span class="${cls(c.historical.ev)}">${usd(c.historical.ev)}</span>`, v: (c) => Math.min(c.base.ev, c.historical.ev) },
+    { k: 'cvar', t: 'CVaR 5%（歷史）', f: (c) => `<span class="neg">${usd(c.historical.cvar5)}</span>`, v: (c) => c.historical.cvar5 },
+    { k: 'score', t: 'EV ÷ 風險', f: (c) => `<b class="${cls(c.score)}">${(c.score * 100).toFixed(1)}%</b>`, v: (c) => c.score },
+    { k: 'calc', t: '', f: (c) => `<a href="${calcLink(c)}">計算器 →</a>`, v: () => 0 },
+  ];
+
+  function legsText(c) {
+    return c.legs.map((l) => `${l.qty < 0 ? '賣' : '買'} ${l.strike}${l.type}${l.qty < 0 ? `<span class="note">(${Math.abs(l.delta).toFixed(2)})</span>` : ''}`).join(' · ');
+  }
+
+  // 每腳成交估計：short 往 bid、long 往 ask 偏移 fill_haircut
+  function calcLink(c) {
+    const h = data.config.fill_haircut;
+    const legs = c.legs.map((l) => {
+      const m = (l.bid + l.ask) / 2;
+      const px = l.qty < 0 ? m - h * (m - l.bid) : m + h * (l.ask - m);
+      return `${l.type}:${l.strike}:${l.qty}:${px.toFixed(2)}:${l.iv.toFixed(4)}`;
+    }).join(',');
+    const q = new URLSearchParams({
+      S: data.market.spx.toFixed(2), dte: c.dte, iv: (c.atm_iv * 100).toFixed(1), rv: (c.real_vol * 100).toFixed(1),
+      slip: 0, comm: data.config.commission_per_contract, legs,
+    });
+    return `calculator/?${q}`;
+  }
+
+  function render() {
+    const m = data.market;
+    $('meta').textContent = `資料日期 ${data.asof} · 產生於 ${data.generated_at.replace('T', ' ').slice(0, 16)} UTC · ${data.source}`;
+    const kpi = (k, v, n, c = '') => `<div class="kpi"><div class="k">${k}</div><div class="v ${c}">${v}</div>${n ? `<div class="n">${n}</div>` : ''}</div>`;
+    $('market').innerHTML = [
+      kpi('SPX', m.spx.toFixed(2), m.spx_change_pct != null ? `${m.spx_change_pct > 0 ? '+' : ''}${m.spx_change_pct.toFixed(2)}%` : '', cls(m.spx_change_pct)),
+      kpi('VIX', m.vix.toFixed(2), `${m.vix_date}`),
+      kpi('VIX 一年位階', pct(m.vix_rank_1y, 0), `百分位 ${pct(m.vix_percentile_1y, 0)}`),
+      kpi('SPX 20 日實現波動', pct(m.rv20)),
+      kpi('VIX − 實現波動', ((m.vrp_proxy) * 100).toFixed(1) + ' 點', '正值 = 選擇權相對偏貴', cls(m.vrp_proxy)),
+    ].join('');
+
+    const c = data.config;
+    $('rules').innerHTML = [
+      `策略：${c.strategies.map((s) => NAMES[s] || s).join('、')}`,
+      `DTE ${c.dte_min}–${c.dte_max}`,
+      `short Δ ${c.short_deltas.join(' / ')}`,
+      `寬度 ${c.widths.join(' / ')} 點`,
+      `權利金/寬度 ≥ ${c.min_credit_to_width}`,
+      `每腳價差 ≤ max($${c.max_leg_spread_abs}, ${+(c.max_leg_spread_pct * 100).toFixed(1)}% mid)`,
+      `成交估計 haircut ${c.fill_haircut}`,
+      `手續費 $${c.commission_per_contract}/口/腳`,
+      `模型：IV × ${c.real_vol_ratio}、μ ${+(c.mu * 100).toFixed(2)}%、${c.model === 't' ? `t(ν=${c.nu})` : '常態'}`,
+    ].map((x) => `<span>${x}</span>`).join('');
+
+    const rows = [...data.candidates].sort((a, b) => {
+      const col = COLS.find((x) => x.k === sortKey);
+      return (col.v(a) > col.v(b) ? 1 : col.v(a) < col.v(b) ? -1 : 0) * sortDir;
+    });
+    $('tbl').innerHTML = `<thead><tr>${COLS.map((x) => `<th class="${x.l ? 'l' : ''}" data-k="${x.k}">${x.t}${sortKey === x.k ? (sortDir < 0 ? ' ↓' : ' ↑') : ''}</th>`).join('')}</tr></thead>
+      <tbody>${rows.length ? rows.map((r) => `<tr>${COLS.map((x) => `<td class="${x.l ? 'l' : ''}">${x.f(r)}</td>`).join('')}</tr>`).join('')
+        : `<tr><td colspan="${COLS.length}" class="empty">今天沒有符合規則的組合。</td></tr>`}</tbody>`;
+
+    const rj = data.counts.rejected;
+    $('rejects').textContent = `共 ${data.counts.candidates} 筆通過規則，每種策略顯示前 ${data.config.top_n_per_strategy || data.candidates.length} 筆。` +
+      (Object.keys(rj).length ? ' 排除：' + Object.entries(rj).map(([k, v]) => `${k} ${v}`).join('、') + '。' : '');
+  }
+
+  $('tbl').addEventListener('click', (e) => {
+    const k = e.target.closest('th')?.dataset.k;
+    if (!k || k === 'calc') return;
+    if (k === sortKey) sortDir = -sortDir; else { sortKey = k; sortDir = -1; }
+    render();
+  });
+
+  async function load(file) {
+    try {
+      const r = await fetch(file, { cache: 'no-store' });
+      data = await r.json();
+      render();
+    } catch (err) {
+      $('meta').textContent = '讀取資料失敗：' + err.message;
+    }
+  }
+
+  $('day').addEventListener('change', () => load($('day').value ? `data/history/${$('day').value}.json` : 'data/latest.json'));
+
+  fetch('data/history/index.json', { cache: 'no-store' }).then((r) => r.json()).then((days) => {
+    $('day').innerHTML = `<option value="">最新</option>` + days.map((d) => `<option>${d}</option>`).join('');
+  }).catch(() => {});
+  load('data/latest.json');
+})();
+</script>
+</body>
+</html>

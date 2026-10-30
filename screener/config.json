@@ -1,0 +1,32 @@
+{
+  "_說明": "掃描規則。預設值來自研究報告的證據整理，可自行修改。",
+  "strategies": ["bull_put", "bear_call", "iron_condor"],
+  "dte_min": 30,
+  "dte_max": 50,
+  "short_deltas": [0.10, 0.16, 0.20],
+  "widths": [25, 50],
+  "strike_multiple": 5,
+
+  "_流動性": "每腳 bid/ask 價差需 <= max(絕對值, 比例 × mid)；short 腳最少未平倉量",
+  "max_leg_spread_abs": 1.0,
+  "max_leg_spread_pct": 0.15,
+  "min_short_open_interest": 10,
+
+  "_權利金門檻": "credit / 寬度 太低時，損益兩平勝率會高到不切實際",
+  "min_credit_to_width": 0.08,
+
+  "_成交價": "0 = 以 mid 成交，1 = 以 natural（賣 bid、買 ask）成交",
+  "fill_haircut": 0.3,
+  "commission_per_contract": 1.20,
+
+  "rate": 0.04,
+  "div_yield": 0.013,
+
+  "_分佈": "模型情境：實現波動 = ATM IV × real_vol_ratio、漂移 mu、Student-t 肥尾。另有 SPX 歷史實證情境（不需設定）。排序取兩者較差者",
+  "real_vol_ratio": 0.90,
+  "mu": 0.07,
+  "model": "t",
+  "nu": 4,
+
+  "top_n_per_strategy": 8
+}
