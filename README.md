@@ -1,4 +1,4 @@
-# SPX 選擇權價差工具
+# SPX / XSP 選擇權價差工具
 
 研究與教育用途，**不是投資建議**。
 
@@ -17,7 +17,7 @@ python3 -m http.server 8000 --directory docs   # 打開 http://localhost:8000
 
 ## 方法
 
-- 資料：Cboe 延遲報價（SPXW 選擇權鏈的 bid/ask/IV/Delta）、SPX 歷史收盤（1975 起）、VIX 歷史。
+- 資料：Cboe 延遲報價（SPXW 與 XSP 選擇權鏈的 bid/ask/IV/Delta；XSP = SPX 的 1/10）、SPX 歷史收盤（1975 起）、VIX 歷史。
 - 成交價估計：mid 與 natural 之間，由 `fill_haircut` 控制。
 - 每個組合用兩種到期分佈計算 EV、勝率、最大虧損機率、CVaR 5%：
   - **模型**：Student-t 肥尾，實現波動 = ATM IV × `real_vol_ratio`。

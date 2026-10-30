@@ -4,11 +4,14 @@
   "dte_min": 30,
   "dte_max": 50,
   "short_deltas": [0.10, 0.16, 0.20],
-  "widths": [25, 50],
-  "strike_multiple": 5,
 
-  "_流動性": "每腳 bid/ask 價差需 <= max(絕對值, 比例 × mid)；short 腳最少未平倉量",
-  "max_leg_spread_abs": 1.0,
+  "_標的": "各標的的履約價間距、價差寬度、流動性門檻與手續費。XSP = SPX 的 1/10，適合小帳戶",
+  "underlyings": {
+    "SPX": {"root": "SPXW", "strike_multiple": 5, "widths": [25, 50], "max_leg_spread_abs": 1.0, "commission_per_contract": 1.20},
+    "XSP": {"root": "XSP", "strike_multiple": 1, "widths": [3, 5], "max_leg_spread_abs": 0.30, "commission_per_contract": 0.70}
+  },
+
+  "_流動性": "每腳 bid/ask 價差需 <= max(標的的 max_leg_spread_abs, 比例 × mid)；short 腳最少未平倉量",
   "max_leg_spread_pct": 0.15,
   "min_short_open_interest": 10,
 
@@ -17,7 +20,6 @@
 
   "_成交價": "0 = 以 mid 成交，1 = 以 natural（賣 bid、買 ask）成交",
   "fill_haircut": 0.3,
-  "commission_per_contract": 1.20,
 
   "rate": 0.04,
   "div_yield": 0.013,

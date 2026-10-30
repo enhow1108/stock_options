@@ -91,6 +91,11 @@ li { margin: 3px 0; }
 .empty { color: var(--muted); padding: 24px 0; text-align: center; }
 .linkbtn { border: 0; background: none; color: var(--accent); padding: 0; font-size: 13px; }
 .linkbtn:hover { text-decoration: underline; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; gap: 2px; }
+.seg button { border: 0; border-radius: 999px; background: none; padding: 3px 12px; font-size: 12px; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); font-weight: 600; }
+.cand-head { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.cand-head h2 { margin: 0; }
 .loaded { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
 #screen .warn { margin-bottom: 16px; }
 code { font-size: 12px; }
@@ -121,7 +126,10 @@ code { font-size: 12px; }
   </section>
 
   <section class="card">
-    <h2>候選組合（每種策略取前幾名，依「模型與歷史兩者中較差的 EV ÷ 最大虧損」排序；點欄位可重排）</h2>
+    <div class="cand-head">
+      <h2>候選組合（依「模型與歷史兩者中較差的 EV ÷ 最大虧損」排序；點欄位可重排）</h2>
+      <div class="seg" id="undSeg" role="group" aria-label="標的"></div>
+    </div>
     <div class="scroll"><table id="tbl"></table></div>
     <p class="note" id="rejects"></p>
   </section>
@@ -133,7 +141,7 @@ code { font-size: 12px; }
       <li><b>模型</b>：Student-t 肥尾分佈，實現波動 = ATM IV × <code>real_vol_ratio</code>。<b>歷史</b>：1975 年起 SPX 所有相同天數的實際報酬（含 1987、2008、2020），沒有模型假設，但包含過去 50 年的牛市漂移。</li>
       <li><b>需要勝率</b>：最大虧損 ÷（最大獲利＋最大虧損）。實際勝率只比它高幾個百分點，是這類策略的常態。</li>
       <li>所有數字都假設<b>持有到期</b>。tastylive 常見的「賺 50% 或剩 21 天出場」會改變損益分佈，請用計算器的評估日功能模擬。</li>
-      <li>部位大小請用<b>最大虧損</b>計算，不是用收到的權利金。SPX 一口 50 點寬價差的最大虧損約 $4,500；小帳戶可考慮 XSP（SPX 的 1/10）。</li>
+      <li>部位大小請用<b>最大虧損</b>計算，不是用收到的權利金。SPX 一口 50 點寬價差的最大虧損約 $4,500；XSP（SPX 的 1/10）5 點寬約 $450。XSP 流動性較差，bid/ask 價差相對較寬，實際成交價可能比表上估計差。</li>
     </ul>
   </section>
   </section>
@@ -145,7 +153,10 @@ code { font-size: 12px; }
     <section class="card">
       <h2>市場</h2>
       <div class="grid2">
-        <label>SPX 現價<input id="S" type="number" step="1" value="6000"></label>
+        <label style="grid-column: 1 / -1">標的
+          <select id="und"><option value="SPX">SPX（S&amp;P 500 指數，履約價間距 5）</option><option value="XSP">XSP（迷你 SPX，1/10 大小，間距 1）</option></select>
+        </label>
+        <label>指數現價<input id="S" type="number" step="1" value="6000"></label>
         <label>到期天數 DTE<input id="dte" type="number" step="1" min="0" value="45"></label>
         <label>ATM 隱含波動 IV %<input id="iv" type="number" step="0.1" value="16"></label>
         <label title="履約價每低於現價 10%，IV 增加的百分點">Skew（每 −10% 加 IV 點）<input id="skew" type="number" step="0.5" value="6"></label>
@@ -282,12 +293,28 @@ document.getElementById('tab-calc').onclick = () => showTab('calc');
   let legs = [];
 
   const num = (id) => parseFloat($(id).value);
+  const step = () => ($('und').value === 'XSP' ? 1 : 5);
+  // 切換標的：價格與寬度按 10 倍縮放，手續費與滑價換成該標的的預設
+  const UND = { SPX: { comm: '1.20', slip: '0.05', width: 50 }, XSP: { comm: '0.70', slip: '0.02', width: 5 } };
+  let curUnd = null;
+  function applyUnd(scale) {
+    const u = $('und').value;
+    $('width').step = step(); $('width').min = step();
+    const changed = curUnd !== null && curUnd !== u;
+    curUnd = u;
+    if (scale && changed) {
+      const f = u === 'XSP' ? 0.1 : 10;
+      $('S').value = (num('S') * f).toFixed(2);
+      $('width').value = UND[u].width;
+      $('comm').value = UND[u].comm; $('slip').value = UND[u].slip;
+    }
+  }
   function model() {
     return {
       S: num('S'), T: Math.max(num('dte'), 0) / 365, r: num('r') / 100, q: num('q') / 100,
       iv: num('iv') / 100, skew: num('skew'), realVol: num('rv') / 100, mu: num('mu') / 100,
       model: $('model').value, nu: Math.max(num('nu'), 2.1),
-      commission: num('comm') || 0, slippage: num('slip') || 0, strikeStep: 5,
+      commission: num('comm') || 0, slippage: num('slip') || 0, strikeStep: step(),
     };
   }
 
@@ -309,7 +336,7 @@ document.getElementById('tab-calc').onclick = () => showTab('calc');
           <option value="1" ${legs[i].qty > 0 ? 'selected' : ''}>買</option></select></td>
         <td><select data-i="${i}" data-k="type">
           <option ${l.type === 'P' ? 'selected' : ''}>P</option><option ${l.type === 'C' ? 'selected' : ''}>C</option></select></td>
-        <td><input data-i="${i}" data-k="strike" type="number" step="5" value="${l.strike}" style="width:68px"></td>
+        <td><input data-i="${i}" data-k="strike" type="number" step="${step()}" value="${l.strike}" style="width:68px"></td>
         <td><input data-i="${i}" data-k="iv" type="number" step="0.1" placeholder="${(l.iv * 100).toFixed(1)}"
              value="${legs[i].iv != null ? (legs[i].iv * 100).toFixed(1) : ''}" style="width:56px"></td>
         <td><input data-i="${i}" data-k="premium" type="number" step="0.05" placeholder="${l.theo.toFixed(2)}"
@@ -334,7 +361,7 @@ document.getElementById('tab-calc').onclick = () => showTab('calc');
     if (d != null) { legs.splice(+d, 1); update(); }
   });
   $('addLeg').onclick = () => {
-    legs.push({ type: 'P', strike: Math.round(num('S') / 5) * 5, qty: -1, iv: null, premium: null }); update();
+    legs.push({ type: 'P', strike: Math.round(num('S') / step()) * step(), qty: -1, iv: null, premium: null }); update();
   };
   $('build').onclick = build;
 
@@ -498,6 +525,7 @@ document.getElementById('tab-calc').onclick = () => showTab('calc');
   // 載入一組參數：p 為 URLSearchParams，legs 格式 = 類型:履約價:數量:權利金:IV(小數),...
   let touched = false;
   function load(p, label) {
+    if (p.has('und') && UND[p.get('und')]) { $('und').value = p.get('und'); applyUnd(false); $('width').value = UND[p.get('und')].width; }
     for (const id of ['S', 'dte', 'iv', 'n', 'rv', 'mu', 'slip', 'comm', 'skew']) if (p.has(id)) $(id).value = p.get(id);
     if (!p.has('legs')) return false;
     legs = p.get('legs').split(',').map((x) => {
@@ -519,12 +547,14 @@ document.getElementById('tab-calc').onclick = () => showTab('calc');
   }
   // 篩選資料載入後，把預設範例改用最新 SPX 價格（使用者還沒動過才改）
   function setMarket(S) {
-    if (touched || !(S > 0)) return;
+    if (touched || !(S > 0) || $('und').value !== 'SPX') return;
     $('S').value = S.toFixed(2);
     build();
   }
   document.querySelector('#calc').addEventListener('input', (e) => { if (e.target.id !== 'fwd' && e.target.id !== 'ivs') touched = true; });
+  $('und').onchange = () => { applyUnd(true); $('loaded').textContent = ''; if ($('preset').value === 'custom') $('preset').value = 'bull_put'; touched = true; build(); };
   $('preset').onchange = () => { $('loaded').textContent = ''; if ($('preset').value !== 'custom') build(); };
+  applyUnd(false);
   window.Calc = { load, setMarket, redraw: () => chartState && drawChart(chartState) };
   if (!load(new URLSearchParams(location.search))) build();
 })();
@@ -537,9 +567,16 @@ document.getElementById('tab-calc').onclick = () => showTab('calc');
   const pct = (v, d = 1) => v == null ? '—' : (v * 100).toFixed(d) + '%';
   const cls = (v) => v > 0 ? 'pos' : v < 0 ? 'neg' : '';
   let data = null, sortKey = 'score', sortDir = -1;
+  let undFilter = 'SPX';
+  try { undFilter = localStorage.getItem('undFilter') || 'SPX'; } catch (e) {}
+  // 舊資料（只有 SPX）沒有 underlying 欄位與 underlyings 設定
+  const undOf = (c) => c.underlying || 'SPX';
+  const undList = () => Object.keys(data.config.underlyings || { SPX: 1 });
+  const ucfg = (u) => Object.assign({}, data.config, (data.config.underlyings || {})[u]);
+  const priceOf = (u) => (data.market.underlyings || {})[u] || (u === 'SPX' ? data.market.spx : null);
 
   const COLS = [
-    { k: 'strategy', t: '策略', l: true, f: (c) => `<span class="tag">${NAMES[c.strategy] || c.strategy}</span>`, v: (c) => c.strategy },
+    { k: 'strategy', t: '策略', l: true, f: (c) => `<span class="tag">${undOf(c)}</span> <span class="tag">${NAMES[c.strategy] || c.strategy}</span>`, v: (c) => c.strategy },
     { k: 'expiry', t: '到期 / DTE', l: true, f: (c) => `${c.expiry.slice(5)} · ${c.dte}d`, v: (c) => c.dte },
     { k: 'legs', t: '各腳（short Δ）', l: true, f: (c) => `<span class="legtxt">${legsText(c)}</span>`, v: (c) => c.legs[0].strike },
     { k: 'credit', t: '收（mid / nat）', f: (c) => `<b>${c.credit_fill.toFixed(2)}</b> <span class="note">${c.credit_mid.toFixed(2)} / ${c.credit_natural.toFixed(2)}</span>`, v: (c) => c.credit_fill },
@@ -560,15 +597,15 @@ document.getElementById('tab-calc').onclick = () => showTab('calc');
 
   // 每腳成交估計：short 往 bid、long 往 ask 偏移 fill_haircut
   function calcParams(c) {
-    const h = data.config.fill_haircut;
+    const h = data.config.fill_haircut, u = undOf(c);
     const legs = c.legs.map((l) => {
       const m = (l.bid + l.ask) / 2;
       const px = l.qty < 0 ? m - h * (m - l.bid) : m + h * (l.ask - m);
       return `${l.type}:${l.strike}:${l.qty}:${px.toFixed(2)}:${l.iv.toFixed(4)}`;
     }).join(',');
     const q = new URLSearchParams({
-      S: data.market.spx.toFixed(2), dte: c.dte, iv: (c.atm_iv * 100).toFixed(1), rv: (c.real_vol * 100).toFixed(1),
-      slip: 0, comm: data.config.commission_per_contract, legs,
+      und: u, S: priceOf(u).toFixed(2), dte: c.dte, iv: (c.atm_iv * 100).toFixed(1), rv: (c.real_vol * 100).toFixed(1),
+      slip: 0, comm: ucfg(u).commission_per_contract, legs,
     });
     return q;
   }
@@ -579,6 +616,7 @@ document.getElementById('tab-calc').onclick = () => showTab('calc');
     const kpi = (k, v, n, c = '') => `<div class="kpi"><div class="k">${k}</div><div class="v ${c}">${v}</div>${n ? `<div class="n">${n}</div>` : ''}</div>`;
     $('market').innerHTML = [
       kpi('SPX', m.spx.toFixed(2), m.spx_change_pct != null ? `${m.spx_change_pct > 0 ? '+' : ''}${m.spx_change_pct.toFixed(2)}%` : '', cls(m.spx_change_pct)),
+      ...(priceOf('XSP') ? [kpi('XSP', priceOf('XSP').toFixed(2), 'SPX 的 1/10')] : []),
       kpi('VIX', m.vix.toFixed(2), `${m.vix_date}`),
       kpi('VIX 一年位階', pct(m.vix_rank_1y, 0), `百分位 ${pct(m.vix_percentile_1y, 0)}`),
       kpi('SPX 20 日實現波動', pct(m.rv20)),
@@ -590,15 +628,17 @@ document.getElementById('tab-calc').onclick = () => showTab('calc');
       `策略：${c.strategies.map((s) => NAMES[s] || s).join('、')}`,
       `DTE ${c.dte_min}–${c.dte_max}`,
       `short Δ ${c.short_deltas.join(' / ')}`,
-      `寬度 ${c.widths.join(' / ')} 點`,
+      ...undList().map((u) => `${u}：寬度 ${ucfg(u).widths.join(' / ')} 點、每腳價差 ≤ max($${ucfg(u).max_leg_spread_abs}, ${+(c.max_leg_spread_pct * 100).toFixed(1)}% mid)、手續費 $${ucfg(u).commission_per_contract}/口/腳`),
       `權利金/寬度 ≥ ${c.min_credit_to_width}`,
-      `每腳價差 ≤ max($${c.max_leg_spread_abs}, ${+(c.max_leg_spread_pct * 100).toFixed(1)}% mid)`,
       `成交估計 haircut ${c.fill_haircut}`,
-      `手續費 $${c.commission_per_contract}/口/腳`,
       `模型：IV × ${c.real_vol_ratio}、μ ${+(c.mu * 100).toFixed(2)}%、${c.model === 't' ? `t(ν=${c.nu})` : '常態'}`,
     ].map((x) => `<span>${x}</span>`).join('');
 
-    const rows = [...data.candidates].sort((a, b) => {
+    const unds = undList();
+    if (!unds.includes(undFilter)) undFilter = unds[0];
+    $('undSeg').innerHTML = unds.map((u) => `<button data-und="${u}" aria-pressed="${u === undFilter}">${u}</button>`).join('');
+    $('undSeg').hidden = unds.length < 2;
+    const rows = data.candidates.filter((r) => undOf(r) === undFilter).sort((a, b) => {
       const col = COLS.find((x) => x.k === sortKey);
       return (col.v(a) > col.v(b) ? 1 : col.v(a) < col.v(b) ? -1 : 0) * sortDir;
     });
@@ -606,8 +646,9 @@ document.getElementById('tab-calc').onclick = () => showTab('calc');
       <tbody>${rows.length ? rows.map((r) => `<tr>${COLS.map((x) => `<td class="${x.l ? 'l' : ''}">${x.f(r, data.candidates.indexOf(r))}</td>`).join('')}</tr>`).join('')
         : `<tr><td colspan="${COLS.length}" class="empty">今天沒有符合規則的組合。</td></tr>`}</tbody>`;
 
-    const rj = data.counts.rejected;
-    $('rejects').textContent = `共 ${data.counts.candidates} 筆通過規則，每種策略顯示前 ${data.config.top_n_per_strategy || data.candidates.length} 筆。` +
+    const cnt = data.counts[undFilter] || data.counts;
+    const rj = cnt.rejected || {};
+    $('rejects').textContent = `${undFilter} 共 ${cnt.candidates} 筆通過規則，每種策略顯示前 ${data.config.top_n_per_strategy || data.candidates.length} 筆。` +
       (Object.keys(rj).length ? ' 排除：' + Object.entries(rj).map(([k, v]) => `${k} ${v}`).join('、') + '。' : '');
   }
 
@@ -615,13 +656,21 @@ document.getElementById('tab-calc').onclick = () => showTab('calc');
     const b = e.target.closest('[data-calc]');
     if (b) {
       const c = data.candidates[+b.dataset.calc];
-      window.Calc.load(calcParams(c), `${data.asof} · ${NAMES[c.strategy]} · ${c.expiry}（${c.dte} 天）`);
+      window.Calc.load(calcParams(c), `${data.asof} · ${undOf(c)} ${NAMES[c.strategy]} · ${c.expiry}（${c.dte} 天）`);
       showTab('calc');
       return;
     }
     const k = e.target.closest('th')?.dataset.k;
     if (!k || k === 'calc') return;
     if (k === sortKey) sortDir = -sortDir; else { sortKey = k; sortDir = -1; }
+    render();
+  });
+
+  $('undSeg').addEventListener('click', (e) => {
+    const u = e.target.closest('[data-und]')?.dataset.und;
+    if (!u) return;
+    undFilter = u;
+    try { localStorage.setItem('undFilter', u); } catch (err) {}
     render();
   });
 

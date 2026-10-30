@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SPX 信用價差每日篩選器（只用標準庫）。
+"""SPX / XSP 信用價差每日篩選器（只用標準庫）。
 
 資料：Cboe 延遲報價（選擇權鏈含 bid/ask/IV/Greeks）、SPX 與 VIX 歷史。
 輸出：docs/data/latest.json 與 docs/data/history/<日期>.json，供 GitHub Pages 頁面讀取。
@@ -17,10 +17,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "docs" / "data"
 UA = {"User-Agent": "Mozilla/5.0 (spx-spread-screener)"}
-CHAIN_URL = "https://cdn.cboe.com/api/global/delayed_quotes/options/_SPX.json"
+CHAIN_URL = "https://cdn.cboe.com/api/global/delayed_quotes/options/_{}.json"
 SPX_HIST_URL = "https://cdn.cboe.com/api/global/delayed_quotes/charts/historical/_SPX.json"
 VIX_HIST_URL = "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv"
-SYMBOL_RE = re.compile(r"^(SPXW?)(\d{6})([CP])(\d{8})$")
+SYMBOL_RE = re.compile(r"^([A-Z]+)(\d{6})([CP])(\d{8})$")
 MULT = 100
 
 
@@ -57,14 +57,14 @@ def market_context(chain_meta, spx):
 
 # ---------- 選擇權鏈 ----------
 
-def load_chain():
-    d = json.loads(fetch(CHAIN_URL))["data"]
+def load_chain(symbol, root):
+    d = json.loads(fetch(CHAIN_URL.format(symbol)))["data"]
     asof = datetime.fromisoformat(d["last_trade_time"]).date()
     expiries = {}
     for o in d["options"]:
         m = SYMBOL_RE.match(o["option"])
-        # 只用 SPXW（PM 結算），避開 AM 結算的月選開盤結算風險
-        if not m or m.group(1) != "SPXW":
+        # SPX 只用 SPXW（PM 結算），避開 AM 結算的月選開盤結算風險
+        if not m or m.group(1) != root:
             continue
         exp = datetime.strptime(m.group(2), "%y%m%d").date()
         strike = int(m.group(4)) / 1000
@@ -198,8 +198,7 @@ def price_combo(legs, cfg):
     return credit_mid, credit_nat, fill
 
 
-def build_candidates(expiries, asof, mkt, closes, cfg, rejects):
-    S = mkt["spx"]
+def build_candidates(und, S, expiries, asof, closes, cfg, rejects):
     out = []
     for exp, book in sorted(expiries.items()):
         dte = (exp - asof).days
@@ -241,6 +240,7 @@ def build_candidates(expiries, asof, mkt, closes, cfg, rejects):
                     hist = evaluate(legs, fill, cost, max_loss, grid_hist)
                     shorts = [l for l in legs if l["qty"] < 0]
                     out.append({
+                        "underlying": und,
                         "strategy": name,
                         "expiry": exp.isoformat(),
                         "dte": dte,
@@ -272,12 +272,13 @@ def build_candidates(expiries, asof, mkt, closes, cfg, rejects):
 
 
 def top_per_strategy(cands, n):
-    """每種策略各取前 n 名，方便比較（例如 iron condor 為何排在 bull put 後面）。"""
+    """每個標的的每種策略各取前 n 名，方便比較（例如 iron condor 為何排在 bull put 後面）。"""
     seen = {}
     out = []
     for c in cands:
-        if seen.get(c["strategy"], 0) < n:
-            seen[c["strategy"]] = seen.get(c["strategy"], 0) + 1
+        key = (c["underlying"], c["strategy"])
+        if seen.get(key, 0) < n:
+            seen[key] = seen.get(key, 0) + 1
             out.append(c)
     return out
 
@@ -285,13 +286,26 @@ def top_per_strategy(cands, n):
 def main():
     cfg_path = ROOT / "screener" / "config.json"
     cfg = json.loads(cfg_path.read_text())
-    meta, asof, expiries = load_chain()
     spx = json.loads(fetch(SPX_HIST_URL))["data"]
     closes = [float(x["close"]) for x in spx if float(x["close"]) > 0]
-    mkt = market_context(meta, spx)
+
+    cands, counts, prices, mkt, asof = [], {}, {}, None, None
+    for und, ucfg in cfg["underlyings"].items():
+        meta, und_asof, expiries = load_chain(und, ucfg["root"])
+        if mkt is None:
+            mkt = market_context(meta, spx) if und == "SPX" else None
+        asof = max(asof, und_asof) if asof else und_asof
+        prices[und] = meta["current_price"]
+        merged = dict(cfg, **ucfg)
+        rejects = {}
+        # 歷史情境用 SPX 報酬率；XSP 是 SPX 的 1/10，報酬率相同
+        found = build_candidates(und, meta["current_price"], expiries, und_asof, closes, merged, rejects)
+        counts[und] = {"candidates": len(found), "rejected": rejects}
+        cands += found
+    if mkt is None:
+        raise SystemExit("config.json 的 underlyings 需要包含 SPX（市場背景資料來源）")
     mkt["history_start"] = spx[0]["date"]
-    rejects = {}
-    cands = build_candidates(expiries, asof, mkt, closes, cfg, rejects)
+    mkt["underlyings"] = prices
     cands.sort(key=lambda c: c["score"], reverse=True)
 
     report = {
@@ -301,7 +315,7 @@ def main():
         "disclaimer": "依自訂規則的模型篩選結果，僅供教育研究，不是投資建議。",
         "config": {k: v for k, v in cfg.items() if not k.startswith("_")},
         "market": mkt,
-        "counts": {"candidates": len(cands), "rejected": rejects},
+        "counts": counts,
         "candidates": top_per_strategy(cands, cfg["top_n_per_strategy"]),
     }
 
@@ -313,10 +327,11 @@ def main():
     days = sorted((p.stem for p in hist.glob("????-??-??.json")), reverse=True)
     (hist / "index.json").write_text(json.dumps(days))
 
-    print(f"{report['asof']}  SPX {mkt['spx']:.2f}  VIX {mkt['vix']:.2f}  候選 {len(cands)} 筆")
+    print(f"{report['asof']}  SPX {mkt['spx']:.2f}  XSP {prices.get('XSP', 0):.2f}  VIX {mkt['vix']:.2f}  "
+          + "  ".join(f"{u} 候選 {c['candidates']} 筆" for u, c in counts.items()))
     for c in report["candidates"][:5]:
         ks = "/".join(f"{l['strike']:.0f}{l['type']}" for l in c["legs"])
-        print(f"  {c['strategy']:<12} {c['expiry']} {ks:<28} 收 {c['credit_fill']:>6.2f}  "
+        print(f"  {c['underlying']} {c['strategy']:<12} {c['expiry']} {ks:<28} 收 {c['credit_fill']:>6.2f}  "
               f"勝率 模型 {c['base']['pop']:.1%} / 歷史 {c['historical']['pop']:.1%}  EV/風險 {c['ev_per_risk']:+.3f} / {c['ev_per_risk_hist']:+.3f}")
     return 0
 
