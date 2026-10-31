@@ -106,6 +106,16 @@ li { margin: 3px 0; }
 #help td, #help th { text-align: left; white-space: normal; padding: 6px; }
 #help .ex { background: var(--fill); border-radius: 8px; padding: 10px 14px; margin: 8px 0; }
 #help .ex code { font-size: 13px; }
+.status { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; border: 1px solid var(--line); border-left-width: 4px; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; background: var(--panel); }
+.status[data-level="ok"] { border-left-color: var(--good); }
+.status[data-level="warn"] { border-left-color: var(--warn); }
+.status[data-level="danger"] { border-left-color: var(--bad); }
+.status .pill { font-weight: 700; font-size: 13px; padding: 2px 10px; border-radius: 999px; color: var(--bg); }
+.status[data-level="ok"] .pill { background: var(--good); }
+.status[data-level="warn"] .pill { background: var(--warn); }
+.status[data-level="danger"] .pill { background: var(--bad); }
+.status ul { margin: 0; padding-left: 18px; font-size: 13px; }
+.status .note { flex-basis: 100%; }
 .loaded { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
 #screen .warn { margin-bottom: 16px; }
 code { font-size: 12px; }
@@ -125,6 +135,8 @@ code { font-size: 12px; }
   <section id="screen" role="tabpanel" aria-labelledby="tab-screen">
   <div class="warn">依你自訂規則（<code>screener/config.json</code>）用模型與歷史資料篩出的組合，<b>不是投資建議，也不是買賣訊號</b>。資料為 Cboe 收盤延遲報價，實際成交價會不同。</div>
 
+  <div class="status" id="status" data-level="ok" hidden></div>
+
   <section class="card">
     <h2>市場背景</h2>
     <div class="kpis" id="market"></div>
@@ -137,7 +149,7 @@ code { font-size: 12px; }
 
   <section class="card">
     <div class="cand-head">
-      <h2>候選組合（依「模型與歷史兩者中較差的 EV ÷ 最大虧損」排序；點欄位可重排）</h2>
+      <h2>候選組合（依「模型、全部歷史、相似市況三者中最差的 EV ÷ 最大虧損」排序；點欄位可重排）</h2>
       <div class="seg" id="undSeg" role="group" aria-label="標的"></div>
     </div>
     <div class="scroll"><table id="tbl"></table></div>
@@ -148,7 +160,9 @@ code { font-size: 12px; }
     <h2>怎麼看這張表</h2>
     <ul class="note">
       <li><b>收（成交估計）</b>：介於 mid 與 natural（賣 bid、買 ask）之間，依 <code>fill_haircut</code> 設定。</li>
-      <li><b>模型</b>：Student-t 肥尾分佈，實現波動 = ATM IV × <code>real_vol_ratio</code>。<b>歷史</b>：1975 年起 SPX 所有相同天數的實際報酬（含 1987、2008、2020），沒有模型假設，但包含過去 50 年的牛市漂移。</li>
+      <li><b>模型</b>：Student-t 肥尾分佈，實現波動取「ATM IV × <code>real_vol_ratio</code>」與近 20 日、近 5 日實現波動中最大的，大跌後會自動變保守。</li>
+      <li><b>歷史</b>：1975 年起 SPX 所有相同天數的實際報酬（含 1987、2008、2020），沒有模型假設，但包含過去 50 年的牛市漂移。</li>
+      <li><b>相似</b>：只取歷史上 VIX 和現在相近的日子（見市況列），看之後相同天數的實際報酬。回答「在類似恐慌程度下，這種交易過去表現如何」。</li>
       <li><b>需要勝率</b>：最大虧損 ÷（最大獲利＋最大虧損）。實際勝率只比它高幾個百分點，是這類策略的常態。</li>
       <li>所有數字都假設<b>持有到期</b>。tastylive 常見的「賺 50% 或剩 21 天出場」會改變損益分佈，請用計算器的評估日功能模擬。</li>
       <li>部位大小請用<b>最大虧損</b>計算，不是用收到的權利金。SPX 一口 50 點寬價差的最大虧損約 $4,500；XSP（SPX 的 1/10）5 點寬約 $450。XSP 流動性較差，bid/ask 價差相對較寬，實際成交價可能比表上估計差。</li>
@@ -193,10 +207,11 @@ code { font-size: 12px; }
           <tr><th>收</th><td>每股收到的權利金，乘以 100 是一口的金額。小字是 mid 價 / 最差成交價。</td></tr>
           <tr><th>最大虧損</th><td>最壞情況一組賠多少。<b>決定要做幾口時，看這個數字。</b></td></tr>
           <tr><th>需要勝率</th><td>勝率要高過這個數字才不虧。</td></tr>
-          <tr><th>勝率 模型 / 歷史</th><td>到期賺錢的機率。「歷史」是用 1975 年以來 SPX 的真實漲跌算的。</td></tr>
-          <tr><th>EV ÷ 風險</th><td>長期平均每冒 $1 風險賺多少。綠色是正、紅色是負。</td></tr>
+          <tr><th>勝率 模型 / 歷史 / 相似</th><td>到期賺錢的機率。「歷史」用 1975 年以來 SPX 的真實漲跌；「相似」只用 VIX 和現在差不多的時期，最能反映目前市況。</td></tr>
+          <tr><th>EV ÷ 風險</th><td>長期平均每冒 $1 風險賺多少，取三種情境中最差的。綠色是正、紅色是負。</td></tr>
         </tbody>
       </table>
+      <p>篩選頁最上方的<b>市況列</b>會依單日跌幅、距高點回檔、VIX 高低與 VIX / VIX3M 顯示「正常／注意／警戒」。它只是提醒，不會擋掉任何組合；看到「警戒」時，建議優先看「相似」那一欄的勝率與 EV。</p>
       <p class="note">上方「報價」顯示資料時間。資料來自 Cboe，延遲約 15 分鐘，下單前請以券商即時報價為準。</p>
     </section>
 
@@ -684,10 +699,10 @@ document.getElementById('tab-help').onclick = () => showTab('help');
     { k: 'maxp', t: '最大獲利', f: (c) => usd(c.max_profit), v: (c) => c.max_profit },
     { k: 'maxl', t: '最大虧損', f: (c) => `<span class="neg">${usd(-c.max_loss)}</span>`, v: (c) => -c.max_loss },
     { k: 'bewr', t: '需要勝率', f: (c) => pct(c.breakeven_win_rate_fixed), v: (c) => c.breakeven_win_rate_fixed },
-    { k: 'pop', t: '勝率 模型 / 歷史', f: (c) => `${pct(c.base.pop)} / ${pct(c.historical.pop)}`, v: (c) => c.historical.pop },
-    { k: 'pml', t: '最大虧損機率（歷史）', f: (c) => pct(c.historical.p_max_loss), v: (c) => -c.historical.p_max_loss },
-    { k: 'ev', t: 'EV 模型 / 歷史', f: (c) => `<span class="${cls(c.base.ev)}">${usd(c.base.ev)}</span> / <span class="${cls(c.historical.ev)}">${usd(c.historical.ev)}</span>`, v: (c) => Math.min(c.base.ev, c.historical.ev) },
-    { k: 'cvar', t: 'CVaR 5%（歷史）', f: (c) => `<span class="neg">${usd(c.historical.cvar5)}</span>`, v: (c) => c.historical.cvar5 },
+    { k: 'pop', t: '勝率 模型 / 歷史 / 相似', f: (c) => `${pct(c.base.pop)} / ${pct(c.historical.pop)}${c.regime ? ` / <b>${pct(c.regime.pop)}</b>` : ''}`, v: (c) => (c.regime || c.historical).pop },
+    { k: 'pml', t: '最大虧損機率（相似）', f: (c) => pct((c.regime || c.historical).p_max_loss), v: (c) => -(c.regime || c.historical).p_max_loss },
+    { k: 'ev', t: 'EV 模型 / 歷史 / 相似', f: (c) => [c.base, c.historical, c.regime].filter(Boolean).map((x) => `<span class="${cls(x.ev)}">${usd(x.ev)}</span>`).join(' / '), v: (c) => Math.min(c.base.ev, c.historical.ev, c.regime ? c.regime.ev : Infinity) },
+    { k: 'cvar', t: 'CVaR 5%（相似）', f: (c) => `<span class="neg">${usd((c.regime || c.historical).cvar5)}</span>`, v: (c) => (c.regime || c.historical).cvar5 },
     { k: 'score', t: 'EV ÷ 風險', f: (c) => `<b class="${cls(c.score)}">${(c.score * 100).toFixed(1)}%</b>`, v: (c) => c.score },
     { k: 'calc', t: '', f: (c, i) => `<button class="linkbtn" data-calc="${i}">帶入計算器 →</button>`, v: () => 0 },
   ];
@@ -722,8 +737,21 @@ document.getElementById('tab-help').onclick = () => showTab('help');
       <div class="note">資料時間 ${data.quote_time ? data.quote_time.replace('T', ' ').slice(0, 16) + ' 美東' : data.asof}，報價會變動。</div>`;
   }
 
+  function renderStatus() {
+    const m = data.market, el = $('status');
+    if (!m.status) { el.hidden = true; return; }
+    const label = { ok: '市況正常', warn: '市況注意', danger: '市況警戒' }[m.status];
+    const rg = m.regime;
+    el.dataset.level = m.status;
+    el.innerHTML = `<span class="pill">${label}</span>` +
+      (m.alerts.length ? `<ul>${m.alerts.map((a) => `<li class="${a.level === 'danger' ? 'neg' : ''}">${a.text}</li>`).join('')}</ul>` : '<span class="note" style="flex-basis:auto">沒有觸發任何警示條件。</span>') +
+      (rg ? `<span class="note">「相似」情境：1990 年以來 VIX 在 ${rg.vix_low.toFixed(1)}–${rg.vix_high.toFixed(1)} 的 ${rg.days.toLocaleString()} 個交易日。警示只是提醒，不會停止篩選；恐慌時權利金較高，但虧損機率也較高。</span>` : '');
+    el.hidden = false;
+  }
+
   function render() {
     renderHelpExample();
+    renderStatus();
     const m = data.market;
     const qt = data.quote_time ? data.quote_time.replace('T', ' ').slice(0, 16) + ' 美東' : data.asof;
     const live = !$('day').value;
@@ -733,9 +761,11 @@ document.getElementById('tab-help').onclick = () => showTab('help');
     $('market').innerHTML = [
       kpi('SPX', m.spx.toFixed(2), m.spx_change_pct != null ? `${m.spx_change_pct > 0 ? '+' : ''}${m.spx_change_pct.toFixed(2)}%` : '', cls(m.spx_change_pct)),
       ...(priceOf('XSP') ? [kpi('XSP', priceOf('XSP').toFixed(2), 'SPX 的 1/10')] : []),
-      kpi('VIX', m.vix.toFixed(2), `${m.vix_date}`),
+      kpi('VIX', m.vix.toFixed(2), m.vix_change_pct != null ? `${m.vix_change_pct > 0 ? '+' : ''}${m.vix_change_pct.toFixed(1)}%${m.vix_high ? `，盤中高 ${m.vix_high.toFixed(2)}` : ''}` : (m.vix_date || ''), m.vix_change_pct > 0 ? 'neg' : m.vix_change_pct < 0 ? 'pos' : ''),
+      ...(m.vix3m ? [kpi('VIX / VIX3M', (m.vix / m.vix3m).toFixed(2), `VIX9D ${m.vix9d ? m.vix9d.toFixed(2) : '—'} · VIX3M ${m.vix3m.toFixed(2)}；≥1 代表短期恐慌`, m.vix >= m.vix3m ? 'neg' : '')] : []),
       kpi('VIX 一年位階', pct(m.vix_rank_1y, 0), `百分位 ${pct(m.vix_percentile_1y, 0)}`),
-      kpi('SPX 20 日實現波動', pct(m.rv20)),
+      ...(m.drawdown_52w != null ? [kpi('距一年高點', pct(m.drawdown_52w), '', cls(m.drawdown_52w))] : []),
+      kpi('SPX 實現波動', m.rv5 != null ? `${pct(m.rv5)} / ${pct(m.rv20)}` : pct(m.rv20), m.rv5 != null ? '近 5 日 / 近 20 日' : '近 20 日'),
       kpi('VIX − 實現波動', ((m.vrp_proxy) * 100).toFixed(1) + ' 點', '正值 = 選擇權相對偏貴', cls(m.vrp_proxy)),
     ].join('');
 

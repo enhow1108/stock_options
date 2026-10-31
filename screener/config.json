@@ -24,11 +24,23 @@
   "rate": 0.04,
   "div_yield": 0.013,
 
-  "_分佈": "模型情境：實現波動 = ATM IV × real_vol_ratio、漂移 mu、Student-t 肥尾。另有 SPX 歷史實證情境（不需設定）。排序取兩者較差者",
+  "_分佈": "模型情境：實現波動 = max(ATM IV × real_vol_ratio, 近 20 日與近 5 日實現波動)、漂移 mu、Student-t 肥尾。另有 SPX 全部歷史與相似市況兩種實證情境。排序取三者最差者",
   "real_vol_ratio": 0.90,
   "mu": 0.07,
   "model": "t",
   "nu": 4,
+
+  "_相似市況": "只用歷史上 VIX 落在「目前 VIX ÷(1+band) ～ ×(1+band)」的日子算報酬；樣本少於 min_windows 會自動放寬",
+  "regime": {"vix_band": 0.20, "min_windows": 500},
+
+  "_警示": "市況提醒門檻（漲跌幅與回檔為 %，VIX 為點數）。只顯示提醒，不會停止篩選",
+  "alerts": {
+    "day_drop_warn": -1.5, "day_drop_danger": -3.0,
+    "drawdown_warn": -5.0, "drawdown_danger": -10.0,
+    "vix_warn": 25, "vix_danger": 35,
+    "vix_jump_warn": 20,
+    "term_ratio_warn": 0.95
+  },
 
   "top_n_per_strategy": 8
 }

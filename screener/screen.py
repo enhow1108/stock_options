@@ -20,6 +20,7 @@ UA = {"User-Agent": "Mozilla/5.0 (spx-spread-screener)"}
 CHAIN_URL = "https://cdn.cboe.com/api/global/delayed_quotes/options/_{}.json"
 SPX_HIST_URL = "https://cdn.cboe.com/api/global/delayed_quotes/charts/historical/_SPX.json"
 VIX_HIST_URL = "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv"
+QUOTE_URL = "https://cdn.cboe.com/api/global/delayed_quotes/quotes/_{}.json"
 SYMBOL_RE = re.compile(r"^([A-Z]+)(\d{6})([CP])(\d{8})$")
 MULT = 100
 
@@ -32,27 +33,97 @@ def fetch(url):
 
 # ---------- 市場背景 ----------
 
-def market_context(chain_meta, spx):
-    closes = [float(x["close"]) for x in spx[-21:]]
-    rets = [math.log(closes[i] / closes[i - 1]) for i in range(1, len(closes))]
-    mean = sum(rets) / len(rets)
-    rv20 = math.sqrt(sum((r - mean) ** 2 for r in rets) / (len(rets) - 1) * 252)
+def realized_vol(closes, n):
+    rets = [math.log(closes[i] / closes[i - 1]) for i in range(len(closes) - n, len(closes))]
+    # 以 0 為平均（短窗口常用做法，避免少量樣本的平均值扭曲）
+    return math.sqrt(sum(r * r for r in rets) / n * 252)
 
-    rows = fetch(VIX_HIST_URL).decode().strip().splitlines()[1:]
-    vix = [float(r.split(",")[4]) for r in rows[-252:]]
-    cur = vix[-1]
-    lo, hi = min(vix), max(vix)
-    return {
+
+def vix_history():
+    """VIX 每日收盤（1990 起），回傳 {ISO 日期: 收盤}。"""
+    out = {}
+    for row in fetch(VIX_HIST_URL).decode().strip().splitlines()[1:]:
+        d, *_, close = row.split(",")
+        m, dd, y = d.split("/")
+        out[f"{y}-{m}-{dd}"] = float(close)
+    return out
+
+
+def quote(symbol):
+    return json.loads(fetch(QUOTE_URL.format(symbol)))["data"]
+
+
+def market_alerts(m, cfg):
+    """依市況產生提醒。level: warn（注意）/ danger（警戒）。門檻在 config.json 的 alerts。"""
+    a = cfg["alerts"]
+    out = []
+
+    def add(level, text):
+        out.append({"level": level, "text": text})
+
+    chg = m["spx_change_pct"] or 0
+    if chg <= a["day_drop_danger"]:
+        add("danger", f"SPX 單日跌 {chg:.1f}%")
+    elif chg <= a["day_drop_warn"]:
+        add("warn", f"SPX 單日跌 {chg:.1f}%")
+    dd = m["drawdown_52w"] * 100
+    if dd <= a["drawdown_danger"]:
+        add("danger", f"SPX 距一年高點 {dd:.1f}%")
+    elif dd <= a["drawdown_warn"]:
+        add("warn", f"SPX 距一年高點 {dd:.1f}%")
+    if m["vix"] >= a["vix_danger"]:
+        add("danger", f"VIX {m['vix']:.1f}，市場高度恐慌")
+    elif m["vix"] >= a["vix_warn"]:
+        add("warn", f"VIX {m['vix']:.1f}，高於平常")
+    if m.get("vix_change_pct") is not None and m["vix_change_pct"] >= a["vix_jump_warn"]:
+        add("warn", f"VIX 單日上升 {m['vix_change_pct']:.0f}%")
+    if m.get("vix3m"):
+        ratio = m["vix"] / m["vix3m"]
+        if ratio >= 1:
+            add("danger", f"VIX 高於 VIX3M（{ratio:.2f}），短期恐慌大於長期，崩盤期常見")
+        elif ratio >= a["term_ratio_warn"]:
+            add("warn", f"VIX / VIX3M = {ratio:.2f}，期限結構趨平")
+    if m["rv5"] > m["vix"] / 100:
+        add("warn", f"最近 5 日實現波動 {m['rv5'] * 100:.1f}% 高於 VIX，選擇權相對變便宜")
+    return out
+
+
+def market_context(chain_meta, spx, vix_hist, cfg):
+    closes = [float(x["close"]) for x in spx if float(x["close"]) > 0]
+    rv5, rv20 = realized_vol(closes, 5), realized_vol(closes, 20)
+    hi52 = max(closes[-252:] + [chain_meta["current_price"]])
+
+    # VIX 用延遲報價（每日 CSV 常晚一天更新）；抓不到時退回 CSV 最後一筆
+    vq = {}
+    for sym in ("VIX", "VIX3M", "VIX9D"):
+        try:
+            vq[sym] = quote(sym)
+        except Exception as e:  # noqa: BLE001
+            print(f"抓 {sym} 報價失敗：{e}", file=sys.stderr)
+    days = sorted(vix_hist)
+    cur = vq["VIX"]["current_price"] if "VIX" in vq else vix_hist[days[-1]]
+    past = [vix_hist[d] for d in days[-252:]]
+    lo, hi = min(past + [cur]), max(past + [cur])
+    m = {
         "spx": chain_meta["current_price"],
         "spx_change_pct": chain_meta.get("price_change_percent"),
         "iv30": chain_meta.get("iv30"),
         "vix": cur,
-        "vix_date": rows[-1].split(",")[0],
+        "vix_change_pct": vq["VIX"].get("price_change_percent") if "VIX" in vq else None,
+        "vix_high": vq["VIX"].get("high") if "VIX" in vq else None,
+        "vix_time": vq["VIX"]["last_trade_time"] if "VIX" in vq else days[-1],
+        "vix3m": vq["VIX3M"]["current_price"] if "VIX3M" in vq else None,
+        "vix9d": vq["VIX9D"]["current_price"] if "VIX9D" in vq else None,
         "vix_rank_1y": (cur - lo) / (hi - lo) if hi > lo else None,
-        "vix_percentile_1y": sum(v < cur for v in vix) / len(vix),
+        "vix_percentile_1y": sum(v < cur for v in past) / len(past),
+        "rv5": rv5,
         "rv20": rv20,
         "vrp_proxy": cur / 100 - rv20,
+        "drawdown_52w": chain_meta["current_price"] / hi52 - 1,
     }
+    m["alerts"] = market_alerts(m, cfg)
+    m["status"] = "danger" if any(x["level"] == "danger" for x in m["alerts"]) else ("warn" if m["alerts"] else "ok")
+    return m
 
 
 # ---------- 選擇權鏈 ----------
@@ -130,6 +201,29 @@ def historical_grid(S, closes, dte):
     return [S * math.exp(r) for r in rets], [w] * len(rets)
 
 
+def regime_starts(spx, vix_hist, vix_now, cfg):
+    """歷史上 VIX 收盤落在「目前 VIX ± band」的交易日索引（對應 SPX 收盤序列）。
+    樣本不足 min_windows 時逐步放寬 band。回傳 (索引, 實際使用的 band)。"""
+    rc = cfg["regime"]
+    dates = [x["date"] for x in spx if float(x["close"]) > 0]
+    vix = [vix_hist.get(d) for d in dates]
+    band = rc["vix_band"]
+    while True:
+        lo, hi = vix_now / (1 + band), vix_now * (1 + band)
+        idx = [i for i, v in enumerate(vix) if v is not None and lo <= v <= hi]
+        if len(idx) >= rc["min_windows"] or band >= 2:
+            return idx, band
+        band += 0.1
+
+
+def regime_grid(S, closes, starts, dte):
+    """只取「當時 VIX 和現在相近」的起始日，看之後相同天數的實際報酬。"""
+    h = max(1, round(dte * 252 / 365))
+    rets = [math.log(closes[i + h] / closes[i]) for i in starts if i + h < len(closes)]
+    w = 1 / len(rets)
+    return [S * math.exp(r) for r in rets], [w] * len(rets)
+
+
 def intrinsic(t, S, K):
     return max(S - K, 0.0) if t == "C" else max(K - S, 0.0)
 
@@ -198,7 +292,7 @@ def price_combo(legs, cfg):
     return credit_mid, credit_nat, fill
 
 
-def build_candidates(und, S, expiries, asof, closes, cfg, rejects):
+def build_candidates(und, S, expiries, asof, closes, mkt, starts, cfg, rejects):
     out = []
     for exp, book in sorted(expiries.items()):
         dte = (exp - asof).days
@@ -209,9 +303,11 @@ def build_candidates(und, S, expiries, asof, closes, cfg, rejects):
         iv = atm_iv(book, fwd)
         if not iv:
             continue
-        rv = iv * cfg["real_vol_ratio"]
+        # 大跌後波動常會延續：模型波動取「IV × 比例」與近期實現波動的較大者
+        rv = max(iv * cfg["real_vol_ratio"], mkt["rv20"], mkt["rv5"])
         grid_base = terminal_grid(S, T, cfg["mu"], cfg["div_yield"], rv, cfg["model"], cfg["nu"])
         grid_hist = historical_grid(S, closes, dte)
+        grid_regime = regime_grid(S, closes, starts, dte)
 
         for delta in cfg["short_deltas"]:
             for width in cfg["widths"]:
@@ -238,6 +334,7 @@ def build_candidates(und, S, expiries, asof, closes, cfg, rejects):
                     max_loss = (width - fill) * MULT + cost
                     base = evaluate(legs, fill, cost, max_loss, grid_base)
                     hist = evaluate(legs, fill, cost, max_loss, grid_hist)
+                    regime = evaluate(legs, fill, cost, max_loss, grid_regime)
                     shorts = [l for l in legs if l["qty"] < 0]
                     out.append({
                         "underlying": und,
@@ -263,10 +360,12 @@ def build_candidates(und, S, expiries, asof, closes, cfg, rejects):
                         "real_vol": round(rv, 4),
                         "base": {k: (round(v, 4) if isinstance(v, float) else v) for k, v in base.items()},
                         "historical": {k: (round(v, 4) if isinstance(v, float) else v) for k, v in hist.items()},
+                        "regime": {k: (round(v, 4) if isinstance(v, float) else v) for k, v in regime.items()},
                         "ev_per_risk": round(base["ev"] / max_loss, 4),
                         "ev_per_risk_hist": round(hist["ev"] / max_loss, 4),
-                        # 排序用：兩種分佈中較差者，避免只靠單一假設
-                        "score": round(min(base["ev"], hist["ev"]) / max_loss, 4),
+                        "ev_per_risk_regime": round(regime["ev"] / max_loss, 4),
+                        # 排序用：模型、全部歷史、相似市況三者中最差者，避免只靠單一假設
+                        "score": round(min(base["ev"], hist["ev"], regime["ev"]) / max_loss, 4),
                     })
     return out
 
@@ -288,23 +387,27 @@ def main():
     cfg = json.loads(cfg_path.read_text())
     spx = json.loads(fetch(SPX_HIST_URL))["data"]
     closes = [float(x["close"]) for x in spx if float(x["close"]) > 0]
+    vix_hist = vix_history()
 
     cands, counts, prices, mkt, asof, quote_time = [], {}, {}, None, None, ""
     for und, ucfg in cfg["underlyings"].items():
         meta, und_asof, expiries = load_chain(und, ucfg["root"])
+        if und == "SPX":
+            mkt = market_context(meta, spx, vix_hist, cfg)
+            starts, band = regime_starts(spx, vix_hist, mkt["vix"], cfg)
+            mkt["regime"] = {"vix_low": mkt["vix"] / (1 + band), "vix_high": mkt["vix"] * (1 + band),
+                             "days": len(starts), "since": "1990-01-02"}
         if mkt is None:
-            mkt = market_context(meta, spx) if und == "SPX" else None
+            raise SystemExit("config.json 的 underlyings 需要把 SPX 放在第一個（市場背景資料來源）")
         asof = max(asof, und_asof) if asof else und_asof
         quote_time = max(quote_time, meta["last_trade_time"])
         prices[und] = meta["current_price"]
         merged = dict(cfg, **ucfg)
         rejects = {}
         # 歷史情境用 SPX 報酬率；XSP 是 SPX 的 1/10，報酬率相同
-        found = build_candidates(und, meta["current_price"], expiries, und_asof, closes, merged, rejects)
+        found = build_candidates(und, meta["current_price"], expiries, und_asof, closes, mkt, starts, merged, rejects)
         counts[und] = {"candidates": len(found), "rejected": rejects}
         cands += found
-    if mkt is None:
-        raise SystemExit("config.json 的 underlyings 需要包含 SPX（市場背景資料來源）")
     mkt["history_start"] = spx[0]["date"]
     mkt["underlyings"] = prices
     cands.sort(key=lambda c: c["score"], reverse=True)
@@ -340,12 +443,15 @@ def main():
     days = sorted((p.stem for p in hist.glob("????-??-??.json")), reverse=True)
     (hist / "index.json").write_text(json.dumps(days))
 
+    print("市況：" + mkt["status"] + "  " + "；".join(a["text"] for a in mkt["alerts"]))
+    print(f"相似市況：VIX {mkt['regime']['vix_low']:.1f}–{mkt['regime']['vix_high']:.1f}，{mkt['regime']['days']} 個交易日")
     print(f"{report['asof']}  SPX {mkt['spx']:.2f}  XSP {prices.get('XSP', 0):.2f}  VIX {mkt['vix']:.2f}  "
           + "  ".join(f"{u} 候選 {c['candidates']} 筆" for u, c in counts.items()))
     for c in report["candidates"][:5]:
         ks = "/".join(f"{l['strike']:.0f}{l['type']}" for l in c["legs"])
         print(f"  {c['underlying']} {c['strategy']:<12} {c['expiry']} {ks:<28} 收 {c['credit_fill']:>6.2f}  "
-              f"勝率 模型 {c['base']['pop']:.1%} / 歷史 {c['historical']['pop']:.1%}  EV/風險 {c['ev_per_risk']:+.3f} / {c['ev_per_risk_hist']:+.3f}")
+              f"勝率 模型 {c['base']['pop']:.1%} / 歷史 {c['historical']['pop']:.1%} / 相似 {c['regime']['pop']:.1%}  "
+              f"EV/風險 {c['ev_per_risk']:+.3f} / {c['ev_per_risk_hist']:+.3f} / {c['ev_per_risk_regime']:+.3f}")
     return 0
 
 
