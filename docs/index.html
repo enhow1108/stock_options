@@ -96,6 +96,16 @@ li { margin: 3px 0; }
 .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); font-weight: 600; }
 .cand-head { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .cand-head h2 { margin: 0; }
+#help { max-width: 760px; }
+#help .card { margin-bottom: 16px; }
+#help h3 { font-size: 16px; margin: 0 0 8px; text-wrap: balance; }
+#help p, #help li { line-height: 1.7; }
+#help p { margin: 0 0 8px; }
+#help ol, #help ul { margin: 6px 0 8px; padding-left: 22px; }
+#help table { margin: 6px 0 4px; }
+#help td, #help th { text-align: left; white-space: normal; padding: 6px; }
+#help .ex { background: var(--fill); border-radius: 8px; padding: 10px 14px; margin: 8px 0; }
+#help .ex code { font-size: 13px; }
 .loaded { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
 #screen .warn { margin-bottom: 16px; }
 code { font-size: 12px; }
@@ -144,6 +154,95 @@ code { font-size: 12px; }
       <li>部位大小請用<b>最大虧損</b>計算，不是用收到的權利金。SPX 一口 50 點寬價差的最大虧損約 $4,500；XSP（SPX 的 1/10）5 點寬約 $450。XSP 流動性較差，bid/ask 價差相對較寬，實際成交價可能比表上估計差。</li>
     </ul>
   </section>
+  </section>
+
+  <section id="help" role="tabpanel" aria-labelledby="tab-help" hidden>
+    <div class="warn">這裡說明網站怎麼用、在 Firstrade 怎麼下價差單。內容只是操作說明，<b>不是投資建議</b>；要不要交易、做多大，請自己判斷。</div>
+
+    <section class="card">
+      <h3>這個網站在做什麼</h3>
+      <p>盤中每 15 分鐘掃描 SPX 和 XSP 的選擇權，挑出符合規則的<b>賣方價差組合</b>，算出每一組賺多少、賠多少、勝率多少、長期平均划不划算。它只篩選和計算，不會幫你下單。</p>
+      <ul>
+        <li><b>SPX</b>：S&amp;P 500 指數，約 7,500 點。一組 50 點寬的價差最多賠約 $4,500。</li>
+        <li><b>XSP</b>：迷你 SPX，大小是 1/10。一組 5 點寬的價差最多賠約 $450，適合小帳戶或練習。</li>
+        <li>兩者都是<b>現金結算、歐式</b>：到期自動算錢，不會拿到股票，也不會被提前履約。</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h3>三種策略在賭什麼</h3>
+      <table>
+        <tbody>
+          <tr><th>Bull Put</th><td>賭指數到期前<b>不會大跌</b>。賣一個較高的 put、買一個較低的 put 當保險。</td></tr>
+          <tr><th>Bear Call</th><td>賭指數<b>不會大漲</b>。賣一個較低的 call、買一個較高的 call 當保險。</td></tr>
+          <tr><th>Iron Condor</th><td>兩個一起做，賭指數<b>在一個區間內</b>。</td></tr>
+        </tbody>
+      </table>
+      <p class="note">共同點：先收權利金，沒出事就全部賺走；出事最多賠「寬度 − 權利金」。勝率高，但一次虧損約等於好幾次獲利。</p>
+    </section>
+
+    <section class="card">
+      <h3>第 1 步：看「篩選」頁</h3>
+      <ol>
+        <li>在候選組合右上角選 <b>SPX</b> 或 <b>XSP</b>。</li>
+        <li>表格每一列是一筆交易，排在越上面的「EV ÷ 風險」越好。重點欄位：</li>
+      </ol>
+      <table>
+        <tbody>
+          <tr><th>各腳</th><td>要買賣哪幾個履約價，例如「賣 716P · 買 713P」。括號是 short 腳的 Delta，約等於被打到的機率。</td></tr>
+          <tr><th>收</th><td>每股收到的權利金，乘以 100 是一口的金額。小字是 mid 價 / 最差成交價。</td></tr>
+          <tr><th>最大虧損</th><td>最壞情況一組賠多少。<b>決定要做幾口時，看這個數字。</b></td></tr>
+          <tr><th>需要勝率</th><td>勝率要高過這個數字才不虧。</td></tr>
+          <tr><th>勝率 模型 / 歷史</th><td>到期賺錢的機率。「歷史」是用 1975 年以來 SPX 的真實漲跌算的。</td></tr>
+          <tr><th>EV ÷ 風險</th><td>長期平均每冒 $1 風險賺多少。綠色是正、紅色是負。</td></tr>
+        </tbody>
+      </table>
+      <p class="note">上方「報價」顯示資料時間。資料來自 Cboe，延遲約 15 分鐘，下單前請以券商即時報價為準。</p>
+    </section>
+
+    <section class="card">
+      <h3>第 2 步：點「帶入計算器 →」</h3>
+      <ul>
+        <li><b>損益圖</b>：橫軸是到期時的指數價格，縱軸是損益。實線是到期，虛線是「評估日」的盤中損益。</li>
+        <li><b>壓力測試</b>：如果明天大跌 5%、10%，這筆會賠多少？先問自己能不能承受。</li>
+        <li><b>成本</b>：Firstrade 沒有佣金，但有 Cboe 指數期權費。SPX 每口約 $0.50–0.66，XSP 只要幾分錢。可以把「手續費」改成 SPX 約 0.60、XSP 約 0.05。</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h3>第 3 步：在 Firstrade 下單（自己決定）</h3>
+      <ol>
+        <li><b>確認權限</b>：價差單通常需要期權 <b>Level 3</b> 和保證金帳戶，IRA 不能做價差。沒有的話，到 Firstrade 帳戶設定申請。</li>
+        <li>進入期權交易，選<b>價差（Spread）</b>或「期權構建器」，標的輸入代號（SPX 或 XSP）。</li>
+        <li>選到期日，設定兩隻腳：賣的那腳選 <b>Sell to Open</b>，買的那腳選 <b>Buy to Open</b>，口數相同。</li>
+        <li>價格選<b>限價（Limit）</b>，類型選 <b>Credit</b>，輸入「收」欄的價格。不要用市價單。</li>
+        <li>送出前看預覽：收到的金額、最大虧損要和網站上的數字差不多。</li>
+      </ol>
+      <div class="ex" id="helpExample">範例會在篩選資料載入後顯示。</div>
+      <ul>
+        <li>太久沒成交，可以把 credit 每次降 $0.01–0.02 再試。價差單不一定能成交在 mid 價。</li>
+        <li>Iron Condor 是四隻腳，要用支援四腳的下單畫面；不行的話拆成一張 Bull Put 和一張 Bear Call。</li>
+        <li>Firstrade 的實際畫面名稱和費用請以官網為準。</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h3>之後怎麼處理</h3>
+      <ul>
+        <li><b>持有到期</b>：現金結算，到期自動算錢。網站上的數字都是假設持有到期。</li>
+        <li><b>提前出場</b>：下一張相反的價差單，Buy to Close 賣出的那腳、Sell to Close 買進的那腳，把整組買回來。</li>
+        <li>常見做法是賺到約 50% 或剩約 21 天就出場，可以用計算器的「評估日」看看那時大概的損益。</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h3>一定要記得</h3>
+      <ul>
+        <li>勝率約 90% 不代表穩賺。一次虧損約等於 6–8 次獲利，大跌時好幾筆會一起賠。</li>
+        <li>用「最大虧損」決定口數，不要用收到的權利金。</li>
+        <li>所有機率都是模型和歷史推算，不是預測。</li>
+      </ul>
+    </section>
   </section>
 
   <section id="calc" role="tabpanel" aria-labelledby="tab-calc" hidden>
@@ -268,13 +367,14 @@ code { font-size: 12px; }
   <div class="tabs" role="tablist">
     <button role="tab" id="tab-screen" aria-controls="screen" aria-selected="true">篩選</button>
     <button role="tab" id="tab-calc" aria-controls="calc" aria-selected="false">計算器</button>
+    <button role="tab" id="tab-help" aria-controls="help" aria-selected="false">說明</button>
   </div>
 </nav>
 
 <script src="engine.js"></script>
 <script>
 function showTab(name) {
-  for (const t of ['screen', 'calc']) {
+  for (const t of ['screen', 'calc', 'help']) {
     document.getElementById(t).hidden = t !== name;
     document.getElementById('tab-' + t).setAttribute('aria-selected', String(t === name));
   }
@@ -285,6 +385,7 @@ function showTab(name) {
 }
 document.getElementById('tab-screen').onclick = () => showTab('screen');
 document.getElementById('tab-calc').onclick = () => showTab('calc');
+document.getElementById('tab-help').onclick = () => showTab('help');
 </script>
 <script>
 (function () {
@@ -610,7 +711,19 @@ document.getElementById('tab-calc').onclick = () => showTab('calc');
     return q;
   }
 
+  function renderHelpExample() {
+    const pick = ['XSP', 'SPX'].map((u) => data.candidates.find((c) => undOf(c) === u && c.strategy === 'bull_put')).find(Boolean);
+    if (!pick) return;
+    const [s1, l1] = [pick.legs.find((l) => l.qty < 0), pick.legs.find((l) => l.qty > 0)];
+    $('helpExample').innerHTML = `<b>範例（只示範怎麼填，不是建議）：</b>目前篩選表上 ${undOf(pick)} 排名最高的 Bull Put<br>
+      標的 <code>${undOf(pick)}</code> · 到期 <code>${pick.expiry}</code><br>
+      Sell to Open <code>${s1.strike} Put × 1</code> · Buy to Open <code>${l1.strike} Put × 1</code><br>
+      Limit Credit <code>${pick.credit_fill.toFixed(2)}</code>　→ 收約 ${usd(pick.credit_fill * 100)}，最大虧損約 ${usd(pick.max_loss)}
+      <div class="note">資料時間 ${data.quote_time ? data.quote_time.replace('T', ' ').slice(0, 16) + ' 美東' : data.asof}，報價會變動。</div>`;
+  }
+
   function render() {
+    renderHelpExample();
     const m = data.market;
     const qt = data.quote_time ? data.quote_time.replace('T', ' ').slice(0, 16) + ' 美東' : data.asof;
     const live = !$('day').value;
@@ -715,7 +828,7 @@ document.getElementById('tab-calc').onclick = () => showTab('calc');
 })();
 </script>
 <script>
-const tabFromHash = () => (location.hash === '#calc' ? 'calc' : 'screen');
+const tabFromHash = () => ({ '#calc': 'calc', '#help': 'help' }[location.hash] || 'screen');
 window.addEventListener('hashchange', () => showTab(tabFromHash()));
 showTab(tabFromHash());
 </script>
