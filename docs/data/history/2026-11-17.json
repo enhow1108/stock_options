@@ -1,0 +1,3158 @@
+{
+ "asof": "2026-11-17",
+ "quote_time": "2026-11-17T16:14:37",
+ "generated_at": "2026-11-17T21:30:28+00:00",
+ "source": "Cboe delayed quotes",
+ "disclaimer": "依自訂規則的模型篩選結果，僅供教育研究，不是投資建議。",
+ "config": {
+  "strategies": [
+   "bull_put",
+   "bear_call",
+   "iron_condor"
+  ],
+  "dte_min": 30,
+  "dte_max": 50,
+  "short_deltas": [
+   0.1,
+   0.16,
+   0.2
+  ],
+  "underlyings": {
+   "SPX": {
+    "root": "SPXW",
+    "strike_multiple": 5,
+    "widths": [
+     25,
+     50
+    ],
+    "max_leg_spread_abs": 1.0,
+    "commission_per_contract": 1.2
+   },
+   "XSP": {
+    "root": "XSP",
+    "strike_multiple": 1,
+    "widths": [
+     3,
+     5
+    ],
+    "max_leg_spread_abs": 0.3,
+    "commission_per_contract": 0.7
+   }
+  },
+  "max_leg_spread_pct": 0.15,
+  "min_short_open_interest": 10,
+  "min_credit_to_width": 0.08,
+  "fill_haircut": 0.3,
+  "rate": 0.04,
+  "div_yield": 0.013,
+  "real_vol_ratio": 0.9,
+  "mu": 0.07,
+  "model": "t",
+  "nu": 4,
+  "regime": {
+   "vix_band": 0.2,
+   "min_windows": 500
+  },
+  "alerts": {
+   "day_drop_warn": -1.5,
+   "day_drop_danger": -3.0,
+   "drawdown_warn": -5.0,
+   "drawdown_danger": -10.0,
+   "vix_warn": 25,
+   "vix_danger": 35,
+   "vix_jump_warn": 20,
+   "term_ratio_warn": 0.95
+  },
+  "top_n_per_strategy": 8
+ },
+ "market": {
+  "spx": 7340.5298,
+  "spx_change_pct": -1.0255,
+  "iv30": 20.135,
+  "vix": 25.45,
+  "vix_change_pct": 11.0869,
+  "vix_high": 27.73,
+  "vix_time": "2026-11-17T16:14:31",
+  "vix3m": 24.97,
+  "vix9d": 26.65,
+  "vix_rank_1y": 0.6814562002275313,
+  "vix_percentile_1y": 0.9484126984126984,
+  "rv5": 0.1721910333281402,
+  "rv20": 0.2261215017058463,
+  "vrp_proxy": 0.028378498294153703,
+  "drawdown_52w": -0.061184868006236126,
+  "alerts": [
+   {
+    "level": "warn",
+    "text": "SPX 距一年高點 -6.1%"
+   },
+   {
+    "level": "warn",
+    "text": "VIX 25.4，高於平常"
+   },
+   {
+    "level": "danger",
+    "text": "VIX 高於 VIX3M（1.02），短期恐慌大於長期，崩盤期常見"
+   }
+  ],
+  "status": "danger",
+  "regime": {
+   "vix_low": 21.208333333333332,
+   "vix_high": 30.54,
+   "days": 2218,
+   "since": "1990-01-02"
+  },
+  "history_start": "1975-01-02",
+  "underlyings": {
+   "SPX": 7340.5298,
+   "XSP": 734.05
+  }
+ },
+ "counts": {
+  "SPX": {
+   "candidates": 67,
+   "rejected": {
+    "short 腳未平倉量太低": 19,
+    "long 腳不存在或流動性不足": 15,
+    "權利金/寬度太低": 5
+   }
+  },
+  "XSP": {
+   "candidates": 20,
+   "rejected": {
+    "long 腳不存在或流動性不足": 30,
+    "權利金/寬度太低": 6,
+    "short 腳未平倉量太低": 4,
+    "找不到符合 delta 的 short 腳": 4
+   }
+  }
+ },
+ "candidates": [
+  {
+   "underlying": "SPX",
+   "strategy": "bull_put",
+   "expiry": "2026-12-18",
+   "dte": 31,
+   "target_delta": 0.16,
+   "width": 50,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 6800.0,
+     "qty": -1,
+     "bid": 51.8,
+     "ask": 52.7,
+     "iv": 0.2833,
+     "delta": -0.1597,
+     "oi": 2624.0
+    },
+    {
+     "type": "P",
+     "strike": 6750.0,
+     "qty": 1,
+     "bid": 47.1,
+     "ask": 47.9,
+     "iv": 0.2908,
+     "delta": -0.145,
+     "oi": 1570.0
+    }
+   ],
+   "short_deltas": [
+    0.16
+   ],
+   "credit_mid": 4.75,
+   "credit_natural": 3.9,
+   "credit_fill": 4.49,
+   "max_profit": 447.1,
+   "max_loss": 4552.9,
+   "credit_to_width": 0.09,
+   "breakeven_win_rate_fixed": 0.9106,
+   "atm_iv": 0.2026,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": 71.4833,
+    "pop": 0.9186,
+    "avg_win": 447.1,
+    "avg_loss": -4165.0886,
+    "p_max_loss": 0.0685,
+    "cvar5": -4552.9,
+    "be_win_rate": 0.9031
+   },
+   "historical": {
+    "ev": 277.4889,
+    "pop": 0.9639,
+    "avg_win": 447.0068,
+    "avg_loss": -4252.3468,
+    "p_max_loss": 0.0311,
+    "cvar5": -2945.1226,
+    "be_win_rate": 0.9049
+   },
+   "regime": {
+    "ev": 149.7898,
+    "pop": 0.9377,
+    "avg_win": 446.9047,
+    "avg_loss": -4322.0034,
+    "p_max_loss": 0.0555,
+    "cvar5": -4552.9,
+    "be_win_rate": 0.9063
+   },
+   "ev_per_risk": 0.0157,
+   "ev_per_risk_hist": 0.0609,
+   "ev_per_risk_regime": 0.0329,
+   "score": 0.0157
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "bull_put",
+   "expiry": "2026-12-17",
+   "dte": 30,
+   "target_delta": 0.16,
+   "width": 50,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 6800.0,
+     "qty": -1,
+     "bid": 49.9,
+     "ask": 50.8,
+     "iv": 0.2835,
+     "delta": -0.1575,
+     "oi": 99.0
+    },
+    {
+     "type": "P",
+     "strike": 6750.0,
+     "qty": 1,
+     "bid": 45.3,
+     "ask": 46.2,
+     "iv": 0.2911,
+     "delta": -0.1427,
+     "oi": 2.0
+    }
+   ],
+   "short_deltas": [
+    0.158
+   ],
+   "credit_mid": 4.6,
+   "credit_natural": 3.7,
+   "credit_fill": 4.33,
+   "max_profit": 430.6,
+   "max_loss": 4569.4,
+   "credit_to_width": 0.087,
+   "breakeven_win_rate_fixed": 0.9139,
+   "atm_iv": 0.2014,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": 66.6282,
+    "pop": 0.9206,
+    "avg_win": 430.6,
+    "avg_loss": -4150.962,
+    "p_max_loss": 0.0668,
+    "cvar5": -4569.4,
+    "be_win_rate": 0.906
+   },
+   "historical": {
+    "ev": 260.9889,
+    "pop": 0.9639,
+    "avg_win": 430.5068,
+    "avg_loss": -4268.8468,
+    "p_max_loss": 0.0311,
+    "cvar5": -2961.6226,
+    "be_win_rate": 0.9084
+   },
+   "regime": {
+    "ev": 133.2898,
+    "pop": 0.9377,
+    "avg_win": 430.4047,
+    "avg_loss": -4338.5034,
+    "p_max_loss": 0.0555,
+    "cvar5": -4569.4,
+    "be_win_rate": 0.9097
+   },
+   "ev_per_risk": 0.0146,
+   "ev_per_risk_hist": 0.0571,
+   "ev_per_risk_regime": 0.0292,
+   "score": 0.0146
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "iron_condor",
+   "expiry": "2026-12-18",
+   "dte": 31,
+   "target_delta": 0.2,
+   "width": 50,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 6915.0,
+     "qty": -1,
+     "bid": 65.2,
+     "ask": 66.1,
+     "iv": 0.2661,
+     "delta": -0.2006,
+     "oi": 13.0
+    },
+    {
+     "type": "P",
+     "strike": 6865.0,
+     "qty": 1,
+     "bid": 58.9,
+     "ask": 59.8,
+     "iv": 0.2736,
+     "delta": -0.1816,
+     "oi": 6.0
+    },
+    {
+     "type": "C",
+     "strike": 7670.0,
+     "qty": -1,
+     "bid": 37.3,
+     "ask": 38.2,
+     "iv": 0.163,
+     "delta": 0.2002,
+     "oi": 140.0
+    },
+    {
+     "type": "C",
+     "strike": 7720.0,
+     "qty": 1,
+     "bid": 26.7,
+     "ask": 27.4,
+     "iv": 0.1586,
+     "delta": 0.1574,
+     "oi": 1241.0
+    }
+   ],
+   "short_deltas": [
+    0.201,
+    0.2
+   ],
+   "credit_mid": 17.0,
+   "credit_natural": 15.3,
+   "credit_fill": 16.49,
+   "max_profit": 1644.2,
+   "max_loss": 3355.8,
+   "credit_to_width": 0.33,
+   "breakeven_win_rate_fixed": 0.6712,
+   "atm_iv": 0.2026,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": 84.3897,
+    "pop": 0.6773,
+    "avg_win": 1627.0017,
+    "avg_loss": -3153.5816,
+    "p_max_loss": 0.2854,
+    "cvar5": -3355.8,
+    "be_win_rate": 0.6597
+   },
+   "historical": {
+    "ev": 639.3983,
+    "pop": 0.7895,
+    "avg_win": 1624.9371,
+    "avg_loss": -3057.8068,
+    "p_max_loss": 0.1736,
+    "cvar5": -3355.8,
+    "be_win_rate": 0.653
+   },
+   "regime": {
+    "ev": 48.3523,
+    "pop": 0.6664,
+    "avg_win": 1619.3657,
+    "avg_loss": -3089.423,
+    "p_max_loss": 0.2831,
+    "cvar5": -3355.8,
+    "be_win_rate": 0.6561
+   },
+   "ev_per_risk": 0.0251,
+   "ev_per_risk_hist": 0.1905,
+   "ev_per_risk_regime": 0.0144,
+   "score": 0.0144
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "bull_put",
+   "expiry": "2026-12-21",
+   "dte": 34,
+   "target_delta": 0.16,
+   "width": 50,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 6800.0,
+     "qty": -1,
+     "bid": 54.2,
+     "ask": 55.2,
+     "iv": 0.2752,
+     "delta": -0.1633,
+     "oi": 14.0
+    },
+    {
+     "type": "P",
+     "strike": 6750.0,
+     "qty": 1,
+     "bid": 49.3,
+     "ask": 50.3,
+     "iv": 0.2824,
+     "delta": -0.1485,
+     "oi": 0.0
+    }
+   ],
+   "short_deltas": [
+    0.163
+   ],
+   "credit_mid": 4.9,
+   "credit_natural": 3.9,
+   "credit_fill": 4.6,
+   "max_profit": 457.6,
+   "max_loss": 4542.4,
+   "credit_to_width": 0.092,
+   "breakeven_win_rate_fixed": 0.9085,
+   "atm_iv": 0.1973,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": 47.4665,
+    "pop": 0.9122,
+    "avg_win": 457.1083,
+    "avg_loss": -4210.9026,
+    "p_max_loss": 0.0756,
+    "cvar5": -4542.4,
+    "be_win_rate": 0.9021
+   },
+   "historical": {
+    "ev": 277.6123,
+    "pop": 0.9606,
+    "avg_win": 457.4639,
+    "avg_loss": -4110.5565,
+    "p_max_loss": 0.0323,
+    "cvar5": -3142.153,
+    "be_win_rate": 0.8999
+   },
+   "regime": {
+    "ev": 134.2839,
+    "pop": 0.9291,
+    "avg_win": 457.6,
+    "avg_loss": -4103.8346,
+    "p_max_loss": 0.0573,
+    "cvar5": -4542.4,
+    "be_win_rate": 0.8997
+   },
+   "ev_per_risk": 0.0104,
+   "ev_per_risk_hist": 0.0611,
+   "ev_per_risk_regime": 0.0296,
+   "score": 0.0104
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "bull_put",
+   "expiry": "2026-12-18",
+   "dte": 31,
+   "target_delta": 0.16,
+   "width": 25,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 6800.0,
+     "qty": -1,
+     "bid": 51.8,
+     "ask": 52.7,
+     "iv": 0.2833,
+     "delta": -0.1597,
+     "oi": 2624.0
+    },
+    {
+     "type": "P",
+     "strike": 6775.0,
+     "qty": 1,
+     "bid": 49.4,
+     "ask": 50.2,
+     "iv": 0.287,
+     "delta": -0.1522,
+     "oi": 177.0
+    }
+   ],
+   "short_deltas": [
+    0.16
+   ],
+   "credit_mid": 2.45,
+   "credit_natural": 1.6,
+   "credit_fill": 2.2,
+   "max_profit": 217.1,
+   "max_loss": 2282.9,
+   "credit_to_width": 0.088,
+   "breakeven_win_rate_fixed": 0.9132,
+   "atm_iv": 0.2026,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": 20.6323,
+    "pop": 0.9186,
+    "avg_win": 217.1,
+    "avg_loss": -2195.3223,
+    "p_max_loss": 0.0756,
+    "cvar5": -2282.9,
+    "be_win_rate": 0.91
+   },
+   "historical": {
+    "ev": 128.7002,
+    "pop": 0.9637,
+    "avg_win": 217.0949,
+    "avg_loss": -2217.8637,
+    "p_max_loss": 0.0343,
+    "cvar5": -1550.8965,
+    "be_win_rate": 0.9108
+   },
+   "regime": {
+    "ev": 63.8613,
+    "pop": 0.9372,
+    "avg_win": 217.1,
+    "avg_loss": -2224.7971,
+    "p_max_loss": 0.0596,
+    "cvar5": -2282.9,
+    "be_win_rate": 0.9111
+   },
+   "ev_per_risk": 0.009,
+   "ev_per_risk_hist": 0.0564,
+   "ev_per_risk_regime": 0.028,
+   "score": 0.009
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "bull_put",
+   "expiry": "2026-12-17",
+   "dte": 30,
+   "target_delta": 0.16,
+   "width": 25,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 6800.0,
+     "qty": -1,
+     "bid": 49.9,
+     "ask": 50.8,
+     "iv": 0.2835,
+     "delta": -0.1575,
+     "oi": 99.0
+    },
+    {
+     "type": "P",
+     "strike": 6775.0,
+     "qty": 1,
+     "bid": 47.5,
+     "ask": 48.4,
+     "iv": 0.2872,
+     "delta": -0.1499,
+     "oi": 33.0
+    }
+   ],
+   "short_deltas": [
+    0.158
+   ],
+   "credit_mid": 2.4,
+   "credit_natural": 1.5,
+   "credit_fill": 2.13,
+   "max_profit": 210.6,
+   "max_loss": 2289.4,
+   "credit_to_width": 0.085,
+   "breakeven_win_rate_fixed": 0.9158,
+   "atm_iv": 0.2014,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": 20.0635,
+    "pop": 0.9206,
+    "avg_win": 210.6,
+    "avg_loss": -2187.8139,
+    "p_max_loss": 0.072,
+    "cvar5": -2289.4,
+    "be_win_rate": 0.9122
+   },
+   "historical": {
+    "ev": 122.2002,
+    "pop": 0.9637,
+    "avg_win": 210.5949,
+    "avg_loss": -2224.3637,
+    "p_max_loss": 0.0343,
+    "cvar5": -1557.3965,
+    "be_win_rate": 0.9135
+   },
+   "regime": {
+    "ev": 57.3613,
+    "pop": 0.9372,
+    "avg_win": 210.6,
+    "avg_loss": -2231.2971,
+    "p_max_loss": 0.0596,
+    "cvar5": -2289.4,
+    "be_win_rate": 0.9138
+   },
+   "ev_per_risk": 0.0088,
+   "ev_per_risk_hist": 0.0534,
+   "ev_per_risk_regime": 0.0251,
+   "score": 0.0088
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "bull_put",
+   "expiry": "2026-12-31",
+   "dte": 44,
+   "target_delta": 0.16,
+   "width": 50,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 6735.0,
+     "qty": -1,
+     "bid": 59.5,
+     "ask": 60.5,
+     "iv": 0.2725,
+     "delta": -0.1593,
+     "oi": 20.0
+    },
+    {
+     "type": "P",
+     "strike": 6685.0,
+     "qty": 1,
+     "bid": 54.7,
+     "ask": 55.7,
+     "iv": 0.279,
+     "delta": -0.1463,
+     "oi": 30.0
+    }
+   ],
+   "short_deltas": [
+    0.159
+   ],
+   "credit_mid": 4.8,
+   "credit_natural": 3.8,
+   "credit_fill": 4.5,
+   "max_profit": 447.6,
+   "max_loss": 4552.4,
+   "credit_to_width": 0.09,
+   "breakeven_win_rate_fixed": 0.9105,
+   "atm_iv": 0.1931,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": 29.4443,
+    "pop": 0.91,
+    "avg_win": 447.6,
+    "avg_loss": -4200.0086,
+    "p_max_loss": 0.0775,
+    "cvar5": -4552.4,
+    "be_win_rate": 0.9037
+   },
+   "historical": {
+    "ev": 263.6169,
+    "pop": 0.9603,
+    "avg_win": 447.4843,
+    "avg_loss": -4183.9858,
+    "p_max_loss": 0.0337,
+    "cvar5": -3232.0614,
+    "be_win_rate": 0.9034
+   },
+   "regime": {
+    "ev": 161.2258,
+    "pop": 0.9377,
+    "avg_win": 447.2309,
+    "avg_loss": -4143.3575,
+    "p_max_loss": 0.0506,
+    "cvar5": -4552.4,
+    "be_win_rate": 0.9026
+   },
+   "ev_per_risk": 0.0065,
+   "ev_per_risk_hist": 0.0579,
+   "ev_per_risk_regime": 0.0354,
+   "score": 0.0065
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "bull_put",
+   "expiry": "2026-12-18",
+   "dte": 31,
+   "target_delta": 0.2,
+   "width": 50,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 6915.0,
+     "qty": -1,
+     "bid": 65.2,
+     "ask": 66.1,
+     "iv": 0.2661,
+     "delta": -0.2006,
+     "oi": 13.0
+    },
+    {
+     "type": "P",
+     "strike": 6865.0,
+     "qty": 1,
+     "bid": 58.9,
+     "ask": 59.8,
+     "iv": 0.2736,
+     "delta": -0.1816,
+     "oi": 6.0
+    }
+   ],
+   "short_deltas": [
+    0.201
+   ],
+   "credit_mid": 6.3,
+   "credit_natural": 5.4,
+   "credit_fill": 6.03,
+   "max_profit": 600.6,
+   "max_loss": 4399.4,
+   "credit_to_width": 0.121,
+   "breakeven_win_rate_fixed": 0.8799,
+   "atm_iv": 0.2026,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": 26.0615,
+    "pop": 0.8754,
+    "avg_win": 600.6,
+    "avg_loss": -4010.2124,
+    "p_max_loss": 0.1045,
+    "cvar5": -4399.4,
+    "be_win_rate": 0.8697
+   },
+   "historical": {
+    "ev": 318.1191,
+    "pop": 0.938,
+    "avg_win": 600.2414,
+    "avg_loss": -3947.5013,
+    "p_max_loss": 0.0492,
+    "cvar5": -4397.0774,
+    "be_win_rate": 0.868
+   },
+   "regime": {
+    "ev": 125.8801,
+    "pop": 0.8962,
+    "avg_win": 600.0882,
+    "avg_loss": -3966.7415,
+    "p_max_loss": 0.0822,
+    "cvar5": -4399.4,
+    "be_win_rate": 0.8686
+   },
+   "ev_per_risk": 0.0059,
+   "ev_per_risk_hist": 0.0723,
+   "ev_per_risk_regime": 0.0286,
+   "score": 0.0059
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "iron_condor",
+   "expiry": "2026-12-18",
+   "dte": 31,
+   "target_delta": 0.16,
+   "width": 50,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 6800.0,
+     "qty": -1,
+     "bid": 51.8,
+     "ask": 52.7,
+     "iv": 0.2833,
+     "delta": -0.1597,
+     "oi": 2624.0
+    },
+    {
+     "type": "P",
+     "strike": 6750.0,
+     "qty": 1,
+     "bid": 47.1,
+     "ask": 47.9,
+     "iv": 0.2908,
+     "delta": -0.145,
+     "oi": 1570.0
+    },
+    {
+     "type": "C",
+     "strike": 7715.0,
+     "qty": -1,
+     "bid": 27.6,
+     "ask": 28.4,
+     "iv": 0.159,
+     "delta": 0.1615,
+     "oi": 46.0
+    },
+    {
+     "type": "C",
+     "strike": 7765.0,
+     "qty": 1,
+     "bid": 19.3,
+     "ask": 20.1,
+     "iv": 0.1553,
+     "delta": 0.124,
+     "oi": 678.0
+    }
+   ],
+   "short_deltas": [
+    0.16,
+    0.162
+   ],
+   "credit_mid": 13.05,
+   "credit_natural": 11.4,
+   "credit_fill": 12.55,
+   "max_profit": 1250.7,
+   "max_loss": 3749.3,
+   "credit_to_width": 0.251,
+   "breakeven_win_rate_fixed": 0.7499,
+   "atm_iv": 0.2026,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": 21.7449,
+    "pop": 0.7441,
+    "avg_win": 1241.2549,
+    "avg_loss": -3524.1113,
+    "p_max_loss": 0.2245,
+    "cvar5": -3749.3,
+    "be_win_rate": 0.7395
+   },
+   "historical": {
+    "ev": 526.6546,
+    "pop": 0.8458,
+    "avg_win": 1243.6112,
+    "avg_loss": -3404.5035,
+    "p_max_loss": 0.1263,
+    "cvar5": -3749.3,
+    "be_win_rate": 0.7324
+   },
+   "regime": {
+    "ev": 57.6779,
+    "pop": 0.749,
+    "avg_win": 1236.2768,
+    "avg_loss": -3459.041,
+    "p_max_loss": 0.2108,
+    "cvar5": -3749.3,
+    "be_win_rate": 0.7367
+   },
+   "ev_per_risk": 0.0058,
+   "ev_per_risk_hist": 0.1405,
+   "ev_per_risk_regime": 0.0154,
+   "score": 0.0058
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "bull_put",
+   "expiry": "2026-12-21",
+   "dte": 34,
+   "target_delta": 0.16,
+   "width": 25,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 6800.0,
+     "qty": -1,
+     "bid": 54.2,
+     "ask": 55.2,
+     "iv": 0.2752,
+     "delta": -0.1633,
+     "oi": 14.0
+    },
+    {
+     "type": "P",
+     "strike": 6775.0,
+     "qty": 1,
+     "bid": 51.7,
+     "ask": 52.6,
+     "iv": 0.2787,
+     "delta": -0.1557,
+     "oi": 0.0
+    }
+   ],
+   "short_deltas": [
+    0.163
+   ],
+   "credit_mid": 2.55,
+   "credit_natural": 1.6,
+   "credit_fill": 2.26,
+   "max_profit": 224.1,
+   "max_loss": 2275.9,
+   "credit_to_width": 0.091,
+   "breakeven_win_rate_fixed": 0.9104,
+   "atm_iv": 0.1973,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": 9.9735,
+    "pop": 0.9122,
+    "avg_win": 223.6083,
+    "avg_loss": -2210.8348,
+    "p_max_loss": 0.0814,
+    "cvar5": -2275.9,
+    "be_win_rate": 0.9081
+   },
+   "historical": {
+    "ev": 128.9266,
+    "pop": 0.9603,
+    "avg_win": 224.0615,
+    "avg_loss": -2173.5947,
+    "p_max_loss": 0.0359,
+    "cvar5": -1679.3677,
+    "be_win_rate": 0.9065
+   },
+   "regime": {
+    "ev": 52.7838,
+    "pop": 0.9291,
+    "avg_win": 224.1,
+    "avg_loss": -2192.8765,
+    "p_max_loss": 0.065,
+    "cvar5": -2275.9,
+    "be_win_rate": 0.9073
+   },
+   "ev_per_risk": 0.0044,
+   "ev_per_risk_hist": 0.0566,
+   "ev_per_risk_regime": 0.0232,
+   "score": 0.0044
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "iron_condor",
+   "expiry": "2026-12-21",
+   "dte": 34,
+   "target_delta": 0.2,
+   "width": 50,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 6900.0,
+     "qty": -1,
+     "bid": 65.9,
+     "ask": 67.0,
+     "iv": 0.2609,
+     "delta": -0.1982,
+     "oi": 43.0
+    },
+    {
+     "type": "P",
+     "strike": 6850.0,
+     "qty": 1,
+     "bid": 59.7,
+     "ask": 60.7,
+     "iv": 0.268,
+     "delta": -0.1798,
+     "oi": 0.0
+    },
+    {
+     "type": "C",
+     "strike": 7675.0,
+     "qty": -1,
+     "bid": 38.4,
+     "ask": 39.4,
+     "iv": 0.1588,
+     "delta": 0.202,
+     "oi": 186.0
+    },
+    {
+     "type": "C",
+     "strike": 7725.0,
+     "qty": 1,
+     "bid": 27.6,
+     "ask": 28.5,
+     "iv": 0.1545,
+     "delta": 0.1597,
+     "oi": 17.0
+    }
+   ],
+   "short_deltas": [
+    0.198,
+    0.202
+   ],
+   "credit_mid": 17.1,
+   "credit_natural": 15.1,
+   "credit_fill": 16.5,
+   "max_profit": 1645.2,
+   "max_loss": 3354.8,
+   "credit_to_width": 0.33,
+   "breakeven_win_rate_fixed": 0.671,
+   "atm_iv": 0.1973,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": 35.9097,
+    "pop": 0.6693,
+    "avg_win": 1623.7961,
+    "avg_loss": -3178.4984,
+    "p_max_loss": 0.2971,
+    "cvar5": -3354.8,
+    "be_win_rate": 0.6619
+   },
+   "historical": {
+    "ev": 594.3847,
+    "pop": 0.7802,
+    "avg_win": 1626.0485,
+    "avg_loss": -3066.7637,
+    "p_max_loss": 0.1848,
+    "cvar5": -3354.8,
+    "be_win_rate": 0.6535
+   },
+   "regime": {
+    "ev": 2.6296,
+    "pop": 0.6591,
+    "avg_win": 1618.7708,
+    "avg_loss": -3122.6236,
+    "p_max_loss": 0.2957,
+    "cvar5": -3354.8,
+    "be_win_rate": 0.6586
+   },
+   "ev_per_risk": 0.0107,
+   "ev_per_risk_hist": 0.1772,
+   "ev_per_risk_regime": 0.0008,
+   "score": 0.0008
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "iron_condor",
+   "expiry": "2026-12-18",
+   "dte": 31,
+   "target_delta": 0.16,
+   "width": 25,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 6800.0,
+     "qty": -1,
+     "bid": 51.8,
+     "ask": 52.7,
+     "iv": 0.2833,
+     "delta": -0.1597,
+     "oi": 2624.0
+    },
+    {
+     "type": "P",
+     "strike": 6775.0,
+     "qty": 1,
+     "bid": 49.4,
+     "ask": 50.2,
+     "iv": 0.287,
+     "delta": -0.1522,
+     "oi": 177.0
+    },
+    {
+     "type": "C",
+     "strike": 7715.0,
+     "qty": -1,
+     "bid": 27.6,
+     "ask": 28.4,
+     "iv": 0.159,
+     "delta": 0.1615,
+     "oi": 46.0
+    },
+    {
+     "type": "C",
+     "strike": 7740.0,
+     "qty": 1,
+     "bid": 23.1,
+     "ask": 23.9,
+     "iv": 0.1569,
+     "delta": 0.142,
+     "oi": 134.0
+    }
+   ],
+   "short_deltas": [
+    0.16,
+    0.162
+   ],
+   "credit_mid": 6.95,
+   "credit_natural": 5.3,
+   "credit_fill": 6.46,
+   "max_profit": 640.7,
+   "max_loss": 1859.3,
+   "credit_to_width": 0.258,
+   "breakeven_win_rate_fixed": 0.7437,
+   "atm_iv": 0.2026,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": 0.2476,
+    "pop": 0.7397,
+    "avg_win": 637.3533,
+    "avg_loss": -1810.3553,
+    "p_max_loss": 0.2478,
+    "cvar5": -1859.3,
+    "be_win_rate": 0.7396
+   },
+   "historical": {
+    "ev": 254.6225,
+    "pop": 0.8412,
+    "avg_win": 638.7093,
+    "avg_loss": -1779.334,
+    "p_max_loss": 0.1449,
+    "cvar5": -1859.3,
+    "be_win_rate": 0.7359
+   },
+   "regime": {
+    "ev": 9.7511,
+    "pop": 0.7395,
+    "avg_win": 638.0486,
+    "avg_loss": -1773.8733,
+    "p_max_loss": 0.2384,
+    "cvar5": -1859.3,
+    "be_win_rate": 0.7355
+   },
+   "ev_per_risk": 0.0001,
+   "ev_per_risk_hist": 0.1369,
+   "ev_per_risk_regime": 0.0052,
+   "score": 0.0001
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "iron_condor",
+   "expiry": "2026-12-17",
+   "dte": 30,
+   "target_delta": 0.16,
+   "width": 50,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 6800.0,
+     "qty": -1,
+     "bid": 49.9,
+     "ask": 50.8,
+     "iv": 0.2835,
+     "delta": -0.1575,
+     "oi": 99.0
+    },
+    {
+     "type": "P",
+     "strike": 6750.0,
+     "qty": 1,
+     "bid": 45.3,
+     "ask": 46.2,
+     "iv": 0.2911,
+     "delta": -0.1427,
+     "oi": 2.0
+    },
+    {
+     "type": "C",
+     "strike": 7700.0,
+     "qty": -1,
+     "bid": 28.1,
+     "ask": 29.0,
+     "iv": 0.1591,
+     "delta": 0.1666,
+     "oi": 50.0
+    },
+    {
+     "type": "C",
+     "strike": 7750.0,
+     "qty": 1,
+     "bid": 19.6,
+     "ask": 20.4,
+     "iv": 0.1552,
+     "delta": 0.1276,
+     "oi": 128.0
+    }
+   ],
+   "short_deltas": [
+    0.158,
+    0.167
+   ],
+   "credit_mid": 13.15,
+   "credit_natural": 11.4,
+   "credit_fill": 12.62,
+   "max_profit": 1257.7,
+   "max_loss": 3742.3,
+   "credit_to_width": 0.252,
+   "breakeven_win_rate_fixed": 0.7485,
+   "atm_iv": 0.2014,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": 17.6975,
+    "pop": 0.7436,
+    "avg_win": 1244.7155,
+    "avg_loss": -3539.9889,
+    "p_max_loss": 0.2267,
+    "cvar5": -3742.3,
+    "be_win_rate": 0.7399
+   },
+   "historical": {
+    "ev": 481.7396,
+    "pop": 0.8349,
+    "avg_win": 1248.7233,
+    "avg_loss": -3396.2241,
+    "p_max_loss": 0.1355,
+    "cvar5": -3742.3,
+    "be_win_rate": 0.7312
+   },
+   "regime": {
+    "ev": -9.7671,
+    "pop": 0.7332,
+    "avg_win": 1244.2721,
+    "avg_loss": -3455.7226,
+    "p_max_loss": 0.2262,
+    "cvar5": -3742.3,
+    "be_win_rate": 0.7353
+   },
+   "ev_per_risk": 0.0047,
+   "ev_per_risk_hist": 0.1287,
+   "ev_per_risk_regime": -0.0026,
+   "score": -0.0026
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "iron_condor",
+   "expiry": "2026-12-18",
+   "dte": 31,
+   "target_delta": 0.2,
+   "width": 25,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 6915.0,
+     "qty": -1,
+     "bid": 65.2,
+     "ask": 66.1,
+     "iv": 0.2661,
+     "delta": -0.2006,
+     "oi": 13.0
+    },
+    {
+     "type": "P",
+     "strike": 6890.0,
+     "qty": 1,
+     "bid": 61.9,
+     "ask": 62.9,
+     "iv": 0.2698,
+     "delta": -0.1908,
+     "oi": 118.0
+    },
+    {
+     "type": "C",
+     "strike": 7670.0,
+     "qty": -1,
+     "bid": 37.3,
+     "ask": 38.2,
+     "iv": 0.163,
+     "delta": 0.2002,
+     "oi": 140.0
+    },
+    {
+     "type": "C",
+     "strike": 7695.0,
+     "qty": 1,
+     "bid": 31.6,
+     "ask": 32.5,
+     "iv": 0.1606,
+     "delta": 0.1781,
+     "oi": 81.0
+    }
+   ],
+   "short_deltas": [
+    0.201,
+    0.2
+   ],
+   "credit_mid": 8.95,
+   "credit_natural": 7.1,
+   "credit_fill": 8.4,
+   "max_profit": 834.7,
+   "max_loss": 1665.3,
+   "credit_to_width": 0.336,
+   "breakeven_win_rate_fixed": 0.6661,
+   "atm_iv": 0.2026,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": 21.6713,
+    "pop": 0.6693,
+    "avg_win": 830.2939,
+    "avg_loss": -1615.2488,
+    "p_max_loss": 0.3149,
+    "cvar5": -1665.3,
+    "be_win_rate": 0.6605
+   },
+   "historical": {
+    "ev": 297.1709,
+    "pop": 0.7806,
+    "avg_win": 829.3443,
+    "avg_loss": -1595.9915,
+    "p_max_loss": 0.2012,
+    "cvar5": -1665.3,
+    "be_win_rate": 0.658
+   },
+   "regime": {
+    "ev": -10.2679,
+    "pop": 0.6569,
+    "avg_win": 827.3214,
+    "avg_loss": -1613.8107,
+    "p_max_loss": 0.3214,
+    "cvar5": -1665.3,
+    "be_win_rate": 0.6611
+   },
+   "ev_per_risk": 0.013,
+   "ev_per_risk_hist": 0.1784,
+   "ev_per_risk_regime": -0.0062,
+   "score": -0.0062
+  },
+  {
+   "underlying": "XSP",
+   "strategy": "bull_put",
+   "expiry": "2026-12-18",
+   "dte": 31,
+   "target_delta": 0.2,
+   "width": 5,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 690.0,
+     "qty": -1,
+     "bid": 6.14,
+     "ask": 6.58,
+     "iv": 0.2684,
+     "delta": -0.1944,
+     "oi": 853.0
+    },
+    {
+     "type": "P",
+     "strike": 685.0,
+     "qty": 1,
+     "bid": 5.54,
+     "ask": 5.91,
+     "iv": 0.275,
+     "delta": -0.1761,
+     "oi": 640.0
+    }
+   ],
+   "short_deltas": [
+    0.194
+   ],
+   "credit_mid": 0.63,
+   "credit_natural": 0.23,
+   "credit_fill": 0.51,
+   "max_profit": 49.95,
+   "max_loss": 450.05,
+   "credit_to_width": 0.103,
+   "breakeven_win_rate_fixed": 0.9001,
+   "atm_iv": 0.2021,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": -4.4332,
+    "pop": 0.8844,
+    "avg_win": 49.7929,
+    "avg_loss": -419.3788,
+    "p_max_loss": 0.0994,
+    "cvar5": -450.05,
+    "be_win_rate": 0.8939
+   },
+   "historical": {
+    "ev": 23.7372,
+    "pop": 0.9419,
+    "avg_win": 49.9078,
+    "avg_loss": -400.8962,
+    "p_max_loss": 0.0469,
+    "cvar5": -443.4388,
+    "be_win_rate": 0.8893
+   },
+   "regime": {
+    "ev": 5.8015,
+    "pop": 0.902,
+    "avg_win": 49.8571,
+    "avg_loss": -399.8347,
+    "p_max_loss": 0.0799,
+    "cvar5": -450.05,
+    "be_win_rate": 0.8891
+   },
+   "ev_per_risk": -0.0099,
+   "ev_per_risk_hist": 0.0527,
+   "ev_per_risk_regime": 0.0129,
+   "score": -0.0099
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "iron_condor",
+   "expiry": "2026-12-21",
+   "dte": 34,
+   "target_delta": 0.16,
+   "width": 50,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 6800.0,
+     "qty": -1,
+     "bid": 54.2,
+     "ask": 55.2,
+     "iv": 0.2752,
+     "delta": -0.1633,
+     "oi": 14.0
+    },
+    {
+     "type": "P",
+     "strike": 6750.0,
+     "qty": 1,
+     "bid": 49.3,
+     "ask": 50.3,
+     "iv": 0.2824,
+     "delta": -0.1485,
+     "oi": 0.0
+    },
+    {
+     "type": "C",
+     "strike": 7725.0,
+     "qty": -1,
+     "bid": 27.6,
+     "ask": 28.5,
+     "iv": 0.1545,
+     "delta": 0.1597,
+     "oi": 17.0
+    },
+    {
+     "type": "C",
+     "strike": 7775.0,
+     "qty": 1,
+     "bid": 19.5,
+     "ask": 20.3,
+     "iv": 0.1511,
+     "delta": 0.1232,
+     "oi": 17.0
+    }
+   ],
+   "short_deltas": [
+    0.163,
+    0.16
+   ],
+   "credit_mid": 13.05,
+   "credit_natural": 11.2,
+   "credit_fill": 12.5,
+   "max_profit": 1244.7,
+   "max_loss": 3755.3,
+   "credit_to_width": 0.25,
+   "breakeven_win_rate_fixed": 0.7511,
+   "atm_iv": 0.1973,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": -46.3024,
+    "pop": 0.7336,
+    "avg_win": 1231.5099,
+    "avg_loss": -3564.3841,
+    "p_max_loss": 0.2395,
+    "cvar5": -3755.3,
+    "be_win_rate": 0.7432
+   },
+   "historical": {
+    "ev": 473.5461,
+    "pop": 0.8353,
+    "avg_win": 1236.9614,
+    "avg_loss": -3398.5674,
+    "p_max_loss": 0.1347,
+    "cvar5": -3755.3,
+    "be_win_rate": 0.7332
+   },
+   "regime": {
+    "ev": -4.2785,
+    "pop": 0.7354,
+    "avg_win": 1232.0519,
+    "avg_loss": -3441.1082,
+    "p_max_loss": 0.2226,
+    "cvar5": -3755.3,
+    "be_win_rate": 0.7364
+   },
+   "ev_per_risk": -0.0123,
+   "ev_per_risk_hist": 0.1261,
+   "ev_per_risk_regime": -0.0011,
+   "score": -0.0123
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "iron_condor",
+   "expiry": "2026-12-17",
+   "dte": 30,
+   "target_delta": 0.16,
+   "width": 25,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 6800.0,
+     "qty": -1,
+     "bid": 49.9,
+     "ask": 50.8,
+     "iv": 0.2835,
+     "delta": -0.1575,
+     "oi": 99.0
+    },
+    {
+     "type": "P",
+     "strike": 6775.0,
+     "qty": 1,
+     "bid": 47.5,
+     "ask": 48.4,
+     "iv": 0.2872,
+     "delta": -0.1499,
+     "oi": 33.0
+    },
+    {
+     "type": "C",
+     "strike": 7700.0,
+     "qty": -1,
+     "bid": 28.1,
+     "ask": 29.0,
+     "iv": 0.1591,
+     "delta": 0.1666,
+     "oi": 50.0
+    },
+    {
+     "type": "C",
+     "strike": 7725.0,
+     "qty": 1,
+     "bid": 23.5,
+     "ask": 24.4,
+     "iv": 0.1571,
+     "delta": 0.1463,
+     "oi": 71.0
+    }
+   ],
+   "short_deltas": [
+    0.158,
+    0.167
+   ],
+   "credit_mid": 7.0,
+   "credit_natural": 5.2,
+   "credit_fill": 6.46,
+   "max_profit": 641.2,
+   "max_loss": 1858.8,
+   "credit_to_width": 0.258,
+   "breakeven_win_rate_fixed": 0.7435,
+   "atm_iv": 0.2014,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": -5.334,
+    "pop": 0.7372,
+    "avg_win": 637.7339,
+    "avg_loss": -1809.1402,
+    "p_max_loss": 0.2484,
+    "cvar5": -1858.8,
+    "be_win_rate": 0.7394
+   },
+   "historical": {
+    "ev": 227.5096,
+    "pop": 0.8288,
+    "avg_win": 639.0286,
+    "avg_loss": -1764.014,
+    "p_max_loss": 0.1551,
+    "cvar5": -1858.8,
+    "be_win_rate": 0.7341
+   },
+   "regime": {
+    "ev": -28.202,
+    "pop": 0.7246,
+    "avg_win": 638.0784,
+    "avg_loss": -1781.284,
+    "p_max_loss": 0.2537,
+    "cvar5": -1858.8,
+    "be_win_rate": 0.7363
+   },
+   "ev_per_risk": -0.0029,
+   "ev_per_risk_hist": 0.1224,
+   "ev_per_risk_regime": -0.0152,
+   "score": -0.0152
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "bear_call",
+   "expiry": "2026-12-18",
+   "dte": 31,
+   "target_delta": 0.2,
+   "width": 50,
+   "legs": [
+    {
+     "type": "C",
+     "strike": 7670.0,
+     "qty": -1,
+     "bid": 37.3,
+     "ask": 38.2,
+     "iv": 0.163,
+     "delta": 0.2002,
+     "oi": 140.0
+    },
+    {
+     "type": "C",
+     "strike": 7720.0,
+     "qty": 1,
+     "bid": 26.7,
+     "ask": 27.4,
+     "iv": 0.1586,
+     "delta": 0.1574,
+     "oi": 1241.0
+    }
+   ],
+   "short_deltas": [
+    0.2
+   ],
+   "credit_mid": 10.7,
+   "credit_natural": 9.9,
+   "credit_fill": 10.46,
+   "max_profit": 1043.6,
+   "max_loss": 3956.4,
+   "credit_to_width": 0.209,
+   "breakeven_win_rate_fixed": 0.7913,
+   "atm_iv": 0.2026,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": 58.3282,
+    "pop": 0.7958,
+    "avg_win": 1036.1848,
+    "avg_loss": -3753.2531,
+    "p_max_loss": 0.1808,
+    "cvar5": -3956.4,
+    "be_win_rate": 0.7837
+   },
+   "historical": {
+    "ev": 321.2793,
+    "pop": 0.8438,
+    "avg_win": 1037.5743,
+    "avg_loss": -3547.0648,
+    "p_max_loss": 0.1245,
+    "cvar5": -3956.4,
+    "be_win_rate": 0.7737
+   },
+   "regime": {
+    "ev": -77.5279,
+    "pop": 0.7612,
+    "avg_win": 1037.1099,
+    "avg_loss": -3630.0407,
+    "p_max_loss": 0.2009,
+    "cvar5": -3956.4,
+    "be_win_rate": 0.7778
+   },
+   "ev_per_risk": 0.0147,
+   "ev_per_risk_hist": 0.0812,
+   "ev_per_risk_regime": -0.0196,
+   "score": -0.0196
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "bear_call",
+   "expiry": "2026-12-18",
+   "dte": 31,
+   "target_delta": 0.16,
+   "width": 50,
+   "legs": [
+    {
+     "type": "C",
+     "strike": 7715.0,
+     "qty": -1,
+     "bid": 27.6,
+     "ask": 28.4,
+     "iv": 0.159,
+     "delta": 0.1615,
+     "oi": 46.0
+    },
+    {
+     "type": "C",
+     "strike": 7765.0,
+     "qty": 1,
+     "bid": 19.3,
+     "ask": 20.1,
+     "iv": 0.1553,
+     "delta": 0.124,
+     "oi": 678.0
+    }
+   ],
+   "short_deltas": [
+    0.162
+   ],
+   "credit_mid": 8.3,
+   "credit_natural": 7.5,
+   "credit_fill": 8.06,
+   "max_profit": 803.6,
+   "max_loss": 4196.4,
+   "credit_to_width": 0.161,
+   "breakeven_win_rate_fixed": 0.8393,
+   "atm_iv": 0.2026,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": -49.7383,
+    "pop": 0.8192,
+    "avg_win": 802.0872,
+    "avg_loss": -3908.1938,
+    "p_max_loss": 0.156,
+    "cvar5": -4196.4,
+    "be_win_rate": 0.8297
+   },
+   "historical": {
+    "ev": 249.1657,
+    "pop": 0.8778,
+    "avg_win": 801.2641,
+    "avg_loss": -3718.3275,
+    "p_max_loss": 0.0954,
+    "cvar5": -4196.4,
+    "be_win_rate": 0.8227
+   },
+   "regime": {
+    "ev": -92.112,
+    "pop": 0.8036,
+    "avg_win": 799.8299,
+    "avg_loss": -3741.8973,
+    "p_max_loss": 0.1553,
+    "cvar5": -4196.4,
+    "be_win_rate": 0.8239
+   },
+   "ev_per_risk": -0.0119,
+   "ev_per_risk_hist": 0.0594,
+   "ev_per_risk_regime": -0.022,
+   "score": -0.022
+  },
+  {
+   "underlying": "XSP",
+   "strategy": "bull_put",
+   "expiry": "2026-12-17",
+   "dte": 30,
+   "target_delta": 0.2,
+   "width": 5,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 690.0,
+     "qty": -1,
+     "bid": 5.94,
+     "ask": 6.34,
+     "iv": 0.2678,
+     "delta": -0.1926,
+     "oi": 20.0
+    },
+    {
+     "type": "P",
+     "strike": 685.0,
+     "qty": 1,
+     "bid": 5.34,
+     "ask": 5.81,
+     "iv": 0.2761,
+     "delta": -0.1739,
+     "oi": 0.0
+    }
+   ],
+   "short_deltas": [
+    0.193
+   ],
+   "credit_mid": 0.57,
+   "credit_natural": 0.13,
+   "credit_fill": 0.43,
+   "max_profit": 42.05,
+   "max_loss": 457.95,
+   "credit_to_width": 0.087,
+   "breakeven_win_rate_fixed": 0.9159,
+   "atm_iv": 0.203,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": -10.9238,
+    "pop": 0.8844,
+    "avg_win": 42.05,
+    "avg_loss": -416.2874,
+    "p_max_loss": 0.097,
+    "cvar5": -457.95,
+    "be_win_rate": 0.9083
+   },
+   "historical": {
+    "ev": 15.8372,
+    "pop": 0.9417,
+    "avg_win": 42.0188,
+    "avg_loss": -407.1955,
+    "p_max_loss": 0.0469,
+    "cvar5": -451.3388,
+    "be_win_rate": 0.9065
+   },
+   "regime": {
+    "ev": -2.0985,
+    "pop": 0.9016,
+    "avg_win": 41.9813,
+    "avg_loss": -405.8937,
+    "p_max_loss": 0.0799,
+    "cvar5": -457.95,
+    "be_win_rate": 0.9063
+   },
+   "ev_per_risk": -0.0239,
+   "ev_per_risk_hist": 0.0346,
+   "ev_per_risk_regime": -0.0046,
+   "score": -0.0239
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "bear_call",
+   "expiry": "2026-12-18",
+   "dte": 31,
+   "target_delta": 0.16,
+   "width": 25,
+   "legs": [
+    {
+     "type": "C",
+     "strike": 7715.0,
+     "qty": -1,
+     "bid": 27.6,
+     "ask": 28.4,
+     "iv": 0.159,
+     "delta": 0.1615,
+     "oi": 46.0
+    },
+    {
+     "type": "C",
+     "strike": 7740.0,
+     "qty": 1,
+     "bid": 23.1,
+     "ask": 23.9,
+     "iv": 0.1569,
+     "delta": 0.142,
+     "oi": 134.0
+    }
+   ],
+   "short_deltas": [
+    0.162
+   ],
+   "credit_mid": 4.5,
+   "credit_natural": 3.7,
+   "credit_fill": 4.26,
+   "max_profit": 423.6,
+   "max_loss": 2076.4,
+   "credit_to_width": 0.17,
+   "breakeven_win_rate_fixed": 0.8306,
+   "atm_iv": 0.2026,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": -20.3847,
+    "pop": 0.8192,
+    "avg_win": 422.0872,
+    "avg_loss": -2024.6195,
+    "p_max_loss": 0.1722,
+    "cvar5": -2076.4,
+    "be_win_rate": 0.8275
+   },
+   "historical": {
+    "ev": 125.9223,
+    "pop": 0.8753,
+    "avg_win": 422.9425,
+    "avg_loss": -1959.2396,
+    "p_max_loss": 0.1106,
+    "cvar5": -2076.4,
+    "be_win_rate": 0.8225
+   },
+   "regime": {
+    "ev": -54.1102,
+    "pop": 0.7986,
+    "avg_win": 423.4082,
+    "avg_loss": -1948.1236,
+    "p_max_loss": 0.1788,
+    "cvar5": -2076.4,
+    "be_win_rate": 0.8215
+   },
+   "ev_per_risk": -0.0098,
+   "ev_per_risk_hist": 0.0606,
+   "ev_per_risk_regime": -0.0261,
+   "score": -0.0261
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "bear_call",
+   "expiry": "2026-12-18",
+   "dte": 31,
+   "target_delta": 0.2,
+   "width": 25,
+   "legs": [
+    {
+     "type": "C",
+     "strike": 7670.0,
+     "qty": -1,
+     "bid": 37.3,
+     "ask": 38.2,
+     "iv": 0.163,
+     "delta": 0.2002,
+     "oi": 140.0
+    },
+    {
+     "type": "C",
+     "strike": 7695.0,
+     "qty": 1,
+     "bid": 31.6,
+     "ask": 32.5,
+     "iv": 0.1606,
+     "delta": 0.1781,
+     "oi": 81.0
+    }
+   ],
+   "short_deltas": [
+    0.2
+   ],
+   "credit_mid": 5.7,
+   "credit_natural": 4.8,
+   "credit_fill": 5.43,
+   "max_profit": 540.6,
+   "max_loss": 1959.4,
+   "credit_to_width": 0.217,
+   "breakeven_win_rate_fixed": 0.7838,
+   "atm_iv": 0.2026,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": 28.0486,
+    "pop": 0.7909,
+    "avg_win": 539.2349,
+    "avg_loss": -1905.1219,
+    "p_max_loss": 0.1993,
+    "cvar5": -1959.4,
+    "be_win_rate": 0.7794
+   },
+   "historical": {
+    "ev": 153.4119,
+    "pop": 0.8387,
+    "avg_win": 539.1746,
+    "avg_loss": -1852.5179,
+    "p_max_loss": 0.1444,
+    "cvar5": -1959.4,
+    "be_win_rate": 0.7746
+   },
+   "regime": {
+    "ev": -51.7235,
+    "pop": 0.7567,
+    "avg_win": 538.6811,
+    "avg_loss": -1887.5642,
+    "p_max_loss": 0.2257,
+    "cvar5": -1959.4,
+    "be_win_rate": 0.778
+   },
+   "ev_per_risk": 0.0143,
+   "ev_per_risk_hist": 0.0783,
+   "ev_per_risk_regime": -0.0264,
+   "score": -0.0264
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "bear_call",
+   "expiry": "2026-12-21",
+   "dte": 34,
+   "target_delta": 0.2,
+   "width": 50,
+   "legs": [
+    {
+     "type": "C",
+     "strike": 7675.0,
+     "qty": -1,
+     "bid": 38.4,
+     "ask": 39.4,
+     "iv": 0.1588,
+     "delta": 0.202,
+     "oi": 186.0
+    },
+    {
+     "type": "C",
+     "strike": 7725.0,
+     "qty": 1,
+     "bid": 27.6,
+     "ask": 28.5,
+     "iv": 0.1545,
+     "delta": 0.1597,
+     "oi": 17.0
+    }
+   ],
+   "short_deltas": [
+    0.202
+   ],
+   "credit_mid": 10.85,
+   "credit_natural": 9.9,
+   "credit_fill": 10.56,
+   "max_profit": 1054.1,
+   "max_loss": 3945.9,
+   "credit_to_width": 0.211,
+   "breakeven_win_rate_fixed": 0.7892,
+   "atm_iv": 0.1973,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": 29.0387,
+    "pop": 0.7858,
+    "avg_win": 1050.0123,
+    "avg_loss": -3716.6955,
+    "p_max_loss": 0.1899,
+    "cvar5": -3945.9,
+    "be_win_rate": 0.7797
+   },
+   "historical": {
+    "ev": 281.2409,
+    "pop": 0.8334,
+    "avg_win": 1047.974,
+    "avg_loss": -3554.1871,
+    "p_max_loss": 0.1354,
+    "cvar5": -3945.9,
+    "be_win_rate": 0.7723
+   },
+   "regime": {
+    "ev": -112.3427,
+    "pop": 0.753,
+    "avg_win": 1044.8677,
+    "avg_loss": -3641.0939,
+    "p_max_loss": 0.209,
+    "cvar5": -3945.9,
+    "be_win_rate": 0.777
+   },
+   "ev_per_risk": 0.0074,
+   "ev_per_risk_hist": 0.0713,
+   "ev_per_risk_regime": -0.0285,
+   "score": -0.0285
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "bear_call",
+   "expiry": "2026-12-21",
+   "dte": 34,
+   "target_delta": 0.16,
+   "width": 50,
+   "legs": [
+    {
+     "type": "C",
+     "strike": 7725.0,
+     "qty": -1,
+     "bid": 27.6,
+     "ask": 28.5,
+     "iv": 0.1545,
+     "delta": 0.1597,
+     "oi": 17.0
+    },
+    {
+     "type": "C",
+     "strike": 7775.0,
+     "qty": 1,
+     "bid": 19.5,
+     "ask": 20.3,
+     "iv": 0.1511,
+     "delta": 0.1232,
+     "oi": 17.0
+    }
+   ],
+   "short_deltas": [
+    0.16
+   ],
+   "credit_mid": 8.15,
+   "credit_natural": 7.3,
+   "credit_fill": 7.9,
+   "max_profit": 787.1,
+   "max_loss": 4212.9,
+   "credit_to_width": 0.158,
+   "breakeven_win_rate_fixed": 0.8426,
+   "atm_iv": 0.1973,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": -93.7689,
+    "pop": 0.8147,
+    "avg_win": 784.8102,
+    "avg_loss": -3956.1969,
+    "p_max_loss": 0.1639,
+    "cvar5": -4212.9,
+    "be_win_rate": 0.8345
+   },
+   "historical": {
+    "ev": 195.9337,
+    "pop": 0.8702,
+    "avg_win": 784.6867,
+    "avg_loss": -3752.6036,
+    "p_max_loss": 0.1025,
+    "cvar5": -4212.9,
+    "be_win_rate": 0.8271
+   },
+   "regime": {
+    "ev": -138.5623,
+    "pop": 0.7995,
+    "avg_win": 783.4667,
+    "avg_loss": -3816.2951,
+    "p_max_loss": 0.1657,
+    "cvar5": -4212.9,
+    "be_win_rate": 0.8297
+   },
+   "ev_per_risk": -0.0223,
+   "ev_per_risk_hist": 0.0465,
+   "ev_per_risk_regime": -0.0329,
+   "score": -0.0329
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "bear_call",
+   "expiry": "2026-12-17",
+   "dte": 30,
+   "target_delta": 0.16,
+   "width": 50,
+   "legs": [
+    {
+     "type": "C",
+     "strike": 7700.0,
+     "qty": -1,
+     "bid": 28.1,
+     "ask": 29.0,
+     "iv": 0.1591,
+     "delta": 0.1666,
+     "oi": 50.0
+    },
+    {
+     "type": "C",
+     "strike": 7750.0,
+     "qty": 1,
+     "bid": 19.6,
+     "ask": 20.4,
+     "iv": 0.1552,
+     "delta": 0.1276,
+     "oi": 128.0
+    }
+   ],
+   "short_deltas": [
+    0.167
+   ],
+   "credit_mid": 8.55,
+   "credit_natural": 7.7,
+   "credit_fill": 8.3,
+   "max_profit": 827.1,
+   "max_loss": 4172.9,
+   "credit_to_width": 0.166,
+   "breakeven_win_rate_fixed": 0.8346,
+   "atm_iv": 0.2014,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": -48.9307,
+    "pop": 0.8147,
+    "avg_win": 825.0463,
+    "avg_loss": -3891.1272,
+    "p_max_loss": 0.1599,
+    "cvar5": -4172.9,
+    "be_win_rate": 0.8251
+   },
+   "historical": {
+    "ev": 220.7507,
+    "pop": 0.8662,
+    "avg_win": 823.9301,
+    "avg_loss": -3684.2059,
+    "p_max_loss": 0.1044,
+    "cvar5": -4172.9,
+    "be_win_rate": 0.8172
+   },
+   "regime": {
+    "ev": -143.057,
+    "pop": 0.7896,
+    "avg_win": 822.0605,
+    "avg_loss": -3765.3541,
+    "p_max_loss": 0.1707,
+    "cvar5": -4172.9,
+    "be_win_rate": 0.8208
+   },
+   "ev_per_risk": -0.0117,
+   "ev_per_risk_hist": 0.0529,
+   "ev_per_risk_regime": -0.0343,
+   "score": -0.0343
+  },
+  {
+   "underlying": "XSP",
+   "strategy": "iron_condor",
+   "expiry": "2026-12-18",
+   "dte": 31,
+   "target_delta": 0.2,
+   "width": 5,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 690.0,
+     "qty": -1,
+     "bid": 6.14,
+     "ask": 6.58,
+     "iv": 0.2684,
+     "delta": -0.1944,
+     "oi": 853.0
+    },
+    {
+     "type": "P",
+     "strike": 685.0,
+     "qty": 1,
+     "bid": 5.54,
+     "ask": 5.91,
+     "iv": 0.275,
+     "delta": -0.1761,
+     "oi": 640.0
+    },
+    {
+     "type": "C",
+     "strike": 767.0,
+     "qty": -1,
+     "bid": 3.58,
+     "ask": 3.99,
+     "iv": 0.1632,
+     "delta": 0.201,
+     "oi": 127.0
+    },
+    {
+     "type": "C",
+     "strike": 772.0,
+     "qty": 1,
+     "bid": 2.53,
+     "ask": 2.9,
+     "iv": 0.1588,
+     "delta": 0.1582,
+     "oi": 130.0
+    }
+   ],
+   "short_deltas": [
+    0.194,
+    0.201
+   ],
+   "credit_mid": 1.71,
+   "credit_natural": 0.91,
+   "credit_fill": 1.47,
+   "max_profit": 143.85,
+   "max_loss": 356.15,
+   "credit_to_width": 0.293,
+   "breakeven_win_rate_fixed": 0.7123,
+   "atm_iv": 0.2021,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": -9.0499,
+    "pop": 0.6831,
+    "avg_win": 142.3033,
+    "avg_loss": -335.3253,
+    "p_max_loss": 0.2803,
+    "cvar5": -356.15,
+    "be_win_rate": 0.7021
+   },
+   "historical": {
+    "ev": 45.4182,
+    "pop": 0.7916,
+    "avg_win": 142.3107,
+    "avg_loss": -322.6379,
+    "p_max_loss": 0.1713,
+    "cvar5": -356.15,
+    "be_win_rate": 0.6939
+   },
+   "regime": {
+    "ev": -12.3962,
+    "pop": 0.6713,
+    "avg_win": 141.6813,
+    "avg_loss": -327.1122,
+    "p_max_loss": 0.2808,
+    "cvar5": -356.15,
+    "be_win_rate": 0.6978
+   },
+   "ev_per_risk": -0.0254,
+   "ev_per_risk_hist": 0.1275,
+   "ev_per_risk_regime": -0.0348,
+   "score": -0.0348
+  },
+  {
+   "underlying": "SPX",
+   "strategy": "bear_call",
+   "expiry": "2026-12-21",
+   "dte": 34,
+   "target_delta": 0.2,
+   "width": 25,
+   "legs": [
+    {
+     "type": "C",
+     "strike": 7675.0,
+     "qty": -1,
+     "bid": 38.4,
+     "ask": 39.4,
+     "iv": 0.1588,
+     "delta": 0.202,
+     "oi": 186.0
+    },
+    {
+     "type": "C",
+     "strike": 7700.0,
+     "qty": 1,
+     "bid": 32.7,
+     "ask": 33.6,
+     "iv": 0.1565,
+     "delta": 0.1802,
+     "oi": 82.0
+    }
+   ],
+   "short_deltas": [
+    0.202
+   ],
+   "credit_mid": 5.75,
+   "credit_natural": 4.8,
+   "credit_fill": 5.46,
+   "max_profit": 544.1,
+   "max_loss": 1955.9,
+   "credit_to_width": 0.219,
+   "breakeven_win_rate_fixed": 0.7824,
+   "atm_iv": 0.1973,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": 12.3055,
+    "pop": 0.7807,
+    "avg_win": 544.1,
+    "avg_loss": -1880.3371,
+    "p_max_loss": 0.2042,
+    "cvar5": -1955.9,
+    "be_win_rate": 0.7756
+   },
+   "historical": {
+    "ev": 131.2712,
+    "pop": 0.8293,
+    "avg_win": 541.8513,
+    "avg_loss": -1863.9487,
+    "p_max_loss": 0.1543,
+    "cvar5": -1955.9,
+    "be_win_rate": 0.7748
+   },
+   "regime": {
+    "ev": -70.9105,
+    "pop": 0.7476,
+    "avg_win": 540.6499,
+    "avg_loss": -1882.6173,
+    "p_max_loss": 0.2325,
+    "cvar5": -1955.9,
+    "be_win_rate": 0.7769
+   },
+   "ev_per_risk": 0.0063,
+   "ev_per_risk_hist": 0.0671,
+   "ev_per_risk_regime": -0.0363,
+   "score": -0.0363
+  },
+  {
+   "underlying": "XSP",
+   "strategy": "bear_call",
+   "expiry": "2026-12-18",
+   "dte": 31,
+   "target_delta": 0.2,
+   "width": 5,
+   "legs": [
+    {
+     "type": "C",
+     "strike": 767.0,
+     "qty": -1,
+     "bid": 3.58,
+     "ask": 3.99,
+     "iv": 0.1632,
+     "delta": 0.201,
+     "oi": 127.0
+    },
+    {
+     "type": "C",
+     "strike": 772.0,
+     "qty": 1,
+     "bid": 2.53,
+     "ask": 2.9,
+     "iv": 0.1588,
+     "delta": 0.1582,
+     "oi": 130.0
+    }
+   ],
+   "short_deltas": [
+    0.201
+   ],
+   "credit_mid": 1.07,
+   "credit_natural": 0.68,
+   "credit_fill": 0.95,
+   "max_profit": 93.9,
+   "max_loss": 406.1,
+   "credit_to_width": 0.191,
+   "breakeven_win_rate_fixed": 0.8122,
+   "atm_iv": 0.2021,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": -4.6168,
+    "pop": 0.7909,
+    "avg_win": 93.7655,
+    "avg_loss": -376.6723,
+    "p_max_loss": 0.1808,
+    "cvar5": -406.1,
+    "be_win_rate": 0.8007
+   },
+   "historical": {
+    "ev": 21.681,
+    "pop": 0.8428,
+    "avg_win": 93.4077,
+    "avg_loss": -362.9936,
+    "p_max_loss": 0.1245,
+    "cvar5": -406.1,
+    "be_win_rate": 0.7953
+   },
+   "regime": {
+    "ev": -18.1977,
+    "pop": 0.7607,
+    "avg_win": 93.3126,
+    "avg_loss": -372.7163,
+    "p_max_loss": 0.2009,
+    "cvar5": -406.1,
+    "be_win_rate": 0.7998
+   },
+   "ev_per_risk": -0.0114,
+   "ev_per_risk_hist": 0.0534,
+   "ev_per_risk_regime": -0.0448,
+   "score": -0.0448
+  },
+  {
+   "underlying": "XSP",
+   "strategy": "bear_call",
+   "expiry": "2026-12-18",
+   "dte": 31,
+   "target_delta": 0.16,
+   "width": 5,
+   "legs": [
+    {
+     "type": "C",
+     "strike": 772.0,
+     "qty": -1,
+     "bid": 2.53,
+     "ask": 2.9,
+     "iv": 0.1588,
+     "delta": 0.1582,
+     "oi": 130.0
+    },
+    {
+     "type": "C",
+     "strike": 777.0,
+     "qty": 1,
+     "bid": 1.8,
+     "ask": 2.06,
+     "iv": 0.1555,
+     "delta": 0.1212,
+     "oi": 256.0
+    }
+   ],
+   "short_deltas": [
+    0.158
+   ],
+   "credit_mid": 0.78,
+   "credit_natural": 0.47,
+   "credit_fill": 0.69,
+   "max_profit": 67.65,
+   "max_loss": 432.35,
+   "credit_to_width": 0.138,
+   "breakeven_win_rate_fixed": 0.8647,
+   "atm_iv": 0.2021,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": -16.3092,
+    "pop": 0.8235,
+    "avg_win": 67.3645,
+    "avg_loss": -406.7928,
+    "p_max_loss": 0.156,
+    "cvar5": -432.35,
+    "be_win_rate": 0.8579
+   },
+   "historical": {
+    "ev": 13.8245,
+    "pop": 0.8807,
+    "avg_win": 67.47,
+    "avg_loss": -382.1128,
+    "p_max_loss": 0.0925,
+    "cvar5": -432.35,
+    "be_win_rate": 0.8499
+   },
+   "regime": {
+    "ev": -19.4166,
+    "pop": 0.809,
+    "avg_win": 67.2616,
+    "avg_loss": -386.6207,
+    "p_max_loss": 0.1499,
+    "cvar5": -432.35,
+    "be_win_rate": 0.8518
+   },
+   "ev_per_risk": -0.0377,
+   "ev_per_risk_hist": 0.032,
+   "ev_per_risk_regime": -0.0449,
+   "score": -0.0449
+  },
+  {
+   "underlying": "XSP",
+   "strategy": "bear_call",
+   "expiry": "2026-12-21",
+   "dte": 34,
+   "target_delta": 0.16,
+   "width": 5,
+   "legs": [
+    {
+     "type": "C",
+     "strike": 775.0,
+     "qty": -1,
+     "bid": 2.26,
+     "ask": 2.59,
+     "iv": 0.1537,
+     "delta": 0.1413,
+     "oi": 62.0
+    },
+    {
+     "type": "C",
+     "strike": 780.0,
+     "qty": 1,
+     "bid": 1.56,
+     "ask": 1.85,
+     "iv": 0.1505,
+     "delta": 0.1078,
+     "oi": 44.0
+    }
+   ],
+   "short_deltas": [
+    0.141
+   ],
+   "credit_mid": 0.72,
+   "credit_natural": 0.41,
+   "credit_fill": 0.63,
+   "max_profit": 61.3,
+   "max_loss": 438.7,
+   "credit_to_width": 0.125,
+   "breakeven_win_rate_fixed": 0.8774,
+   "atm_iv": 0.1987,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": -20.2908,
+    "pop": 0.8278,
+    "avg_win": 61.14,
+    "avg_loss": -411.78,
+    "p_max_loss": 0.1522,
+    "cvar5": -438.7,
+    "be_win_rate": 0.8707
+   },
+   "historical": {
+    "ev": 10.2394,
+    "pop": 0.8857,
+    "avg_win": 61.1767,
+    "avg_loss": -384.5247,
+    "p_max_loss": 0.0885,
+    "cvar5": -438.7,
+    "be_win_rate": 0.8627
+   },
+   "regime": {
+    "ev": -20.2288,
+    "pop": 0.8217,
+    "avg_win": 61.076,
+    "avg_loss": -394.8486,
+    "p_max_loss": 0.1422,
+    "cvar5": -438.7,
+    "be_win_rate": 0.866
+   },
+   "ev_per_risk": -0.0463,
+   "ev_per_risk_hist": 0.0233,
+   "ev_per_risk_regime": -0.0461,
+   "score": -0.0463
+  },
+  {
+   "underlying": "XSP",
+   "strategy": "iron_condor",
+   "expiry": "2026-12-18",
+   "dte": 31,
+   "target_delta": 0.16,
+   "width": 5,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 680.0,
+     "qty": -1,
+     "bid": 5.03,
+     "ask": 5.43,
+     "iv": 0.2835,
+     "delta": -0.1594,
+     "oi": 598.0
+    },
+    {
+     "type": "P",
+     "strike": 675.0,
+     "qty": 1,
+     "bid": 4.57,
+     "ask": 4.95,
+     "iv": 0.2912,
+     "delta": -0.1447,
+     "oi": 783.0
+    },
+    {
+     "type": "C",
+     "strike": 772.0,
+     "qty": -1,
+     "bid": 2.53,
+     "ask": 2.9,
+     "iv": 0.1588,
+     "delta": 0.1582,
+     "oi": 130.0
+    },
+    {
+     "type": "C",
+     "strike": 777.0,
+     "qty": 1,
+     "bid": 1.8,
+     "ask": 2.06,
+     "iv": 0.1555,
+     "delta": 0.1212,
+     "oi": 256.0
+    }
+   ],
+   "short_deltas": [
+    0.159,
+    0.158
+   ],
+   "credit_mid": 1.26,
+   "credit_natural": 0.55,
+   "credit_fill": 1.04,
+   "max_profit": 101.55,
+   "max_loss": 398.45,
+   "credit_to_width": 0.209,
+   "breakeven_win_rate_fixed": 0.7969,
+   "atm_iv": 0.2021,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": -19.9745,
+    "pop": 0.7441,
+    "avg_win": 101.0671,
+    "avg_loss": -371.916,
+    "p_max_loss": 0.2245,
+    "cvar5": -398.45,
+    "be_win_rate": 0.7863
+   },
+   "historical": {
+    "ev": 30.7619,
+    "pop": 0.8468,
+    "avg_win": 101.1417,
+    "avg_loss": -358.3328,
+    "p_max_loss": 0.1236,
+    "cvar5": -398.45,
+    "be_win_rate": 0.7799
+   },
+   "regime": {
+    "ev": -15.2496,
+    "pop": 0.7508,
+    "avg_win": 100.6666,
+    "avg_loss": -364.4681,
+    "p_max_loss": 0.2054,
+    "cvar5": -398.45,
+    "be_win_rate": 0.7836
+   },
+   "ev_per_risk": -0.0501,
+   "ev_per_risk_hist": 0.0772,
+   "ev_per_risk_regime": -0.0383,
+   "score": -0.0501
+  },
+  {
+   "underlying": "XSP",
+   "strategy": "bear_call",
+   "expiry": "2026-12-18",
+   "dte": 31,
+   "target_delta": 0.1,
+   "width": 5,
+   "legs": [
+    {
+     "type": "C",
+     "strike": 780.0,
+     "qty": -1,
+     "bid": 1.43,
+     "ask": 1.66,
+     "iv": 0.1536,
+     "delta": 0.1022,
+     "oi": 945.0
+    },
+    {
+     "type": "C",
+     "strike": 785.0,
+     "qty": 1,
+     "bid": 0.96,
+     "ask": 1.15,
+     "iv": 0.151,
+     "delta": 0.0756,
+     "oi": 261.0
+    }
+   ],
+   "short_deltas": [
+    0.102
+   ],
+   "credit_mid": 0.49,
+   "credit_natural": 0.28,
+   "credit_fill": 0.43,
+   "max_profit": 41.3,
+   "max_loss": 458.7,
+   "credit_to_width": 0.085,
+   "breakeven_win_rate_fixed": 0.9174,
+   "atm_iv": 0.2021,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": -23.5279,
+    "pop": 0.8623,
+    "avg_win": 41.2146,
+    "avg_loss": -428.8689,
+    "p_max_loss": 0.1185,
+    "cvar5": -458.7,
+    "be_win_rate": 0.9123
+   },
+   "historical": {
+    "ev": 7.4581,
+    "pop": 0.9249,
+    "avg_win": 41.2512,
+    "avg_loss": -408.5316,
+    "p_max_loss": 0.0587,
+    "cvar5": -458.7,
+    "be_win_rate": 0.9083
+   },
+   "regime": {
+    "ev": -12.4353,
+    "pop": 0.8786,
+    "avg_win": 41.2041,
+    "avg_loss": -400.4735,
+    "p_max_loss": 0.0939,
+    "cvar5": -458.7,
+    "be_win_rate": 0.9067
+   },
+   "ev_per_risk": -0.0513,
+   "ev_per_risk_hist": 0.0163,
+   "ev_per_risk_regime": -0.0271,
+   "score": -0.0513
+  },
+  {
+   "underlying": "XSP",
+   "strategy": "iron_condor",
+   "expiry": "2026-12-18",
+   "dte": 31,
+   "target_delta": 0.1,
+   "width": 5,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 655.0,
+     "qty": -1,
+     "bid": 3.14,
+     "ask": 3.46,
+     "iv": 0.3215,
+     "delta": -0.0995,
+     "oi": 318.0
+    },
+    {
+     "type": "P",
+     "strike": 650.0,
+     "qty": 1,
+     "bid": 2.91,
+     "ask": 3.18,
+     "iv": 0.3297,
+     "delta": -0.0911,
+     "oi": 1586.0
+    },
+    {
+     "type": "C",
+     "strike": 780.0,
+     "qty": -1,
+     "bid": 1.43,
+     "ask": 1.66,
+     "iv": 0.1536,
+     "delta": 0.1022,
+     "oi": 945.0
+    },
+    {
+     "type": "C",
+     "strike": 785.0,
+     "qty": 1,
+     "bid": 0.96,
+     "ask": 1.15,
+     "iv": 0.151,
+     "delta": 0.0756,
+     "oi": 261.0
+    }
+   ],
+   "short_deltas": [
+    0.1,
+    0.102
+   ],
+   "credit_mid": 0.74,
+   "credit_natural": 0.24,
+   "credit_fill": 0.59,
+   "max_profit": 56.55,
+   "max_loss": 443.45,
+   "credit_to_width": 0.119,
+   "breakeven_win_rate_fixed": 0.8869,
+   "atm_iv": 0.2021,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": -23.5529,
+    "pop": 0.8294,
+    "avg_win": 56.4593,
+    "avg_loss": -412.4897,
+    "p_max_loss": 0.1466,
+    "cvar5": -443.45,
+    "be_win_rate": 0.8796
+   },
+   "historical": {
+    "ev": 16.8376,
+    "pop": 0.9129,
+    "avg_win": 56.4392,
+    "avg_loss": -398.335,
+    "p_max_loss": 0.0692,
+    "cvar5": -443.45,
+    "be_win_rate": 0.8759
+   },
+   "regime": {
+    "ev": -8.107,
+    "pop": 0.8569,
+    "avg_win": 56.2674,
+    "avg_loss": -393.5415,
+    "p_max_loss": 0.1124,
+    "cvar5": -443.45,
+    "be_win_rate": 0.8749
+   },
+   "ev_per_risk": -0.0531,
+   "ev_per_risk_hist": 0.038,
+   "ev_per_risk_regime": -0.0183,
+   "score": -0.0531
+  },
+  {
+   "underlying": "XSP",
+   "strategy": "bear_call",
+   "expiry": "2026-12-17",
+   "dte": 30,
+   "target_delta": 0.16,
+   "width": 5,
+   "legs": [
+    {
+     "type": "C",
+     "strike": 770.0,
+     "qty": -1,
+     "bid": 2.68,
+     "ask": 3.06,
+     "iv": 0.1592,
+     "delta": 0.1667,
+     "oi": 11.0
+    },
+    {
+     "type": "C",
+     "strike": 775.0,
+     "qty": 1,
+     "bid": 1.88,
+     "ask": 2.15,
+     "iv": 0.1554,
+     "delta": 0.1276,
+     "oi": 32.0
+    }
+   ],
+   "short_deltas": [
+    0.167
+   ],
+   "credit_mid": 0.86,
+   "credit_natural": 0.53,
+   "credit_fill": 0.76,
+   "max_profit": 74.35,
+   "max_loss": 425.65,
+   "credit_to_width": 0.152,
+   "breakeven_win_rate_fixed": 0.8513,
+   "atm_iv": 0.203,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": -13.2437,
+    "pop": 0.8147,
+    "avg_win": 74.1464,
+    "avg_loss": -397.4297,
+    "p_max_loss": 0.1599,
+    "cvar5": -425.65,
+    "be_win_rate": 0.8428
+   },
+   "historical": {
+    "ev": 13.7262,
+    "pop": 0.8657,
+    "avg_win": 74.0771,
+    "avg_loss": -375.4386,
+    "p_max_loss": 0.1044,
+    "cvar5": -425.65,
+    "be_win_rate": 0.8352
+   },
+   "regime": {
+    "ev": -22.6505,
+    "pop": 0.7892,
+    "avg_win": 73.8951,
+    "avg_loss": -384.0248,
+    "p_max_loss": 0.1707,
+    "cvar5": -425.65,
+    "be_win_rate": 0.8386
+   },
+   "ev_per_risk": -0.0311,
+   "ev_per_risk_hist": 0.0322,
+   "ev_per_risk_regime": -0.0532,
+   "score": -0.0532
+  },
+  {
+   "underlying": "XSP",
+   "strategy": "bear_call",
+   "expiry": "2026-12-21",
+   "dte": 34,
+   "target_delta": 0.1,
+   "width": 5,
+   "legs": [
+    {
+     "type": "C",
+     "strike": 780.0,
+     "qty": -1,
+     "bid": 1.56,
+     "ask": 1.85,
+     "iv": 0.1505,
+     "delta": 0.1078,
+     "oi": 44.0
+    },
+    {
+     "type": "C",
+     "strike": 785.0,
+     "qty": 1,
+     "bid": 1.06,
+     "ask": 1.3,
+     "iv": 0.1479,
+     "delta": 0.0806,
+     "oi": 90.0
+    }
+   ],
+   "short_deltas": [
+    0.108
+   ],
+   "credit_mid": 0.52,
+   "credit_natural": 0.26,
+   "credit_fill": 0.45,
+   "max_profit": 43.15,
+   "max_loss": 456.85,
+   "credit_to_width": 0.089,
+   "breakeven_win_rate_fixed": 0.9137,
+   "atm_iv": 0.1987,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": -26.8103,
+    "pop": 0.8516,
+    "avg_win": 43.0886,
+    "avg_loss": -427.8508,
+    "p_max_loss": 0.131,
+    "cvar5": -456.85,
+    "be_win_rate": 0.9085
+   },
+   "historical": {
+    "ev": 4.2646,
+    "pop": 0.913,
+    "avg_win": 43.1208,
+    "avg_loss": -403.4178,
+    "p_max_loss": 0.0674,
+    "cvar5": -456.85,
+    "be_win_rate": 0.9034
+   },
+   "regime": {
+    "ev": -19.8343,
+    "pop": 0.8605,
+    "avg_win": 43.0798,
+    "avg_loss": -407.9063,
+    "p_max_loss": 0.1102,
+    "cvar5": -456.85,
+    "be_win_rate": 0.9045
+   },
+   "ev_per_risk": -0.0587,
+   "ev_per_risk_hist": 0.0093,
+   "ev_per_risk_regime": -0.0434,
+   "score": -0.0587
+  },
+  {
+   "underlying": "XSP",
+   "strategy": "bear_call",
+   "expiry": "2026-12-21",
+   "dte": 34,
+   "target_delta": 0.2,
+   "width": 5,
+   "legs": [
+    {
+     "type": "C",
+     "strike": 770.0,
+     "qty": -1,
+     "bid": 3.11,
+     "ask": 3.57,
+     "iv": 0.1569,
+     "delta": 0.1808,
+     "oi": 93.0
+    },
+    {
+     "type": "C",
+     "strike": 775.0,
+     "qty": 1,
+     "bid": 2.26,
+     "ask": 2.59,
+     "iv": 0.1537,
+     "delta": 0.1413,
+     "oi": 62.0
+    }
+   ],
+   "short_deltas": [
+    0.181
+   ],
+   "credit_mid": 0.92,
+   "credit_natural": 0.52,
+   "credit_fill": 0.8,
+   "max_profit": 78.25,
+   "max_loss": 421.75,
+   "credit_to_width": 0.159,
+   "breakeven_win_rate_fixed": 0.8435,
+   "atm_iv": 0.1987,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": -16.7918,
+    "pop": 0.8007,
+    "avg_win": 77.9412,
+    "avg_loss": -397.3667,
+    "p_max_loss": 0.1765,
+    "cvar5": -421.75,
+    "be_win_rate": 0.836
+   },
+   "historical": {
+    "ev": 10.6022,
+    "pop": 0.8529,
+    "avg_win": 77.9605,
+    "avg_loss": -379.8024,
+    "p_max_loss": 0.1182,
+    "cvar5": -421.75,
+    "be_win_rate": 0.8297
+   },
+   "regime": {
+    "ev": -25.8469,
+    "pop": 0.7743,
+    "avg_win": 77.9256,
+    "avg_loss": -381.7866,
+    "p_max_loss": 0.1842,
+    "cvar5": -421.75,
+    "be_win_rate": 0.8305
+   },
+   "ev_per_risk": -0.0398,
+   "ev_per_risk_hist": 0.0251,
+   "ev_per_risk_regime": -0.0613,
+   "score": -0.0613
+  },
+  {
+   "underlying": "XSP",
+   "strategy": "bear_call",
+   "expiry": "2026-12-31",
+   "dte": 44,
+   "target_delta": 0.1,
+   "width": 5,
+   "legs": [
+    {
+     "type": "C",
+     "strike": 788.0,
+     "qty": -1,
+     "bid": 1.53,
+     "ask": 1.77,
+     "iv": 0.1449,
+     "delta": 0.0978,
+     "oi": 36.0
+    },
+    {
+     "type": "C",
+     "strike": 793.0,
+     "qty": 1,
+     "bid": 1.07,
+     "ask": 1.28,
+     "iv": 0.1427,
+     "delta": 0.0751,
+     "oi": 61.0
+    }
+   ],
+   "short_deltas": [
+    0.098
+   ],
+   "credit_mid": 0.47,
+   "credit_natural": 0.25,
+   "credit_fill": 0.41,
+   "max_profit": 39.35,
+   "max_loss": 460.65,
+   "credit_to_width": 0.081,
+   "breakeven_win_rate_fixed": 0.9213,
+   "atm_iv": 0.1936,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": -29.1824,
+    "pop": 0.8552,
+    "avg_win": 39.35,
+    "avg_loss": -434.0267,
+    "p_max_loss": 0.1278,
+    "cvar5": -460.65,
+    "be_win_rate": 0.9169
+   },
+   "historical": {
+    "ev": -0.664,
+    "pop": 0.911,
+    "avg_win": 39.3196,
+    "avg_loss": -410.039,
+    "p_max_loss": 0.0704,
+    "cvar5": -460.65,
+    "be_win_rate": 0.9125
+   },
+   "regime": {
+    "ev": -25.0751,
+    "pop": 0.8596,
+    "avg_win": 39.2672,
+    "avg_loss": -418.991,
+    "p_max_loss": 0.1169,
+    "cvar5": -460.65,
+    "be_win_rate": 0.9143
+   },
+   "ev_per_risk": -0.0634,
+   "ev_per_risk_hist": -0.0014,
+   "ev_per_risk_regime": -0.0544,
+   "score": -0.0634
+  },
+  {
+   "underlying": "XSP",
+   "strategy": "iron_condor",
+   "expiry": "2026-12-31",
+   "dte": 44,
+   "target_delta": 0.1,
+   "width": 5,
+   "legs": [
+    {
+     "type": "P",
+     "strike": 645.0,
+     "qty": -1,
+     "bid": 3.63,
+     "ask": 4.01,
+     "iv": 0.3108,
+     "delta": -0.0992,
+     "oi": 27.0
+    },
+    {
+     "type": "P",
+     "strike": 640.0,
+     "qty": 1,
+     "bid": 3.36,
+     "ask": 3.73,
+     "iv": 0.3178,
+     "delta": -0.0916,
+     "oi": 49.0
+    },
+    {
+     "type": "C",
+     "strike": 788.0,
+     "qty": -1,
+     "bid": 1.53,
+     "ask": 1.77,
+     "iv": 0.1449,
+     "delta": 0.0978,
+     "oi": 36.0
+    },
+    {
+     "type": "C",
+     "strike": 793.0,
+     "qty": 1,
+     "bid": 1.07,
+     "ask": 1.28,
+     "iv": 0.1427,
+     "delta": 0.0751,
+     "oi": 61.0
+    }
+   ],
+   "short_deltas": [
+    0.099,
+    0.098
+   ],
+   "credit_mid": 0.75,
+   "credit_natural": 0.15,
+   "credit_fill": 0.57,
+   "max_profit": 54.2,
+   "max_loss": 445.8,
+   "credit_to_width": 0.114,
+   "breakeven_win_rate_fixed": 0.8916,
+   "atm_iv": 0.1936,
+   "real_vol": 0.2261,
+   "base": {
+    "ev": -31.6235,
+    "pop": 0.8184,
+    "avg_win": 54.2,
+    "avg_loss": -418.29,
+    "p_max_loss": 0.1599,
+    "cvar5": -445.8,
+    "be_win_rate": 0.8853
+   },
+   "historical": {
+    "ev": 6.2527,
+    "pop": 0.8949,
+    "avg_win": 54.1294,
+    "avg_loss": -401.5205,
+    "p_max_loss": 0.0853,
+    "cvar5": -445.8,
+    "be_win_rate": 0.8812
+   },
+   "regime": {
+    "ev": -22.6563,
+    "pop": 0.8348,
+    "avg_win": 54.0399,
+    "avg_loss": -410.1188,
+    "p_max_loss": 0.1409,
+    "cvar5": -445.8,
+    "be_win_rate": 0.8836
+   },
+   "ev_per_risk": -0.0709,
+   "ev_per_risk_hist": 0.014,
+   "ev_per_risk_regime": -0.0508,
+   "score": -0.0709
+  }
+ ]
+}
